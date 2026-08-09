@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Tizimga kirish{% endblock %}
+
+{% block content %}
+
+<div class="min-h-[80vh] flex items-center justify-center">
+
+    <div class="grid lg:grid-cols-2 bg-white rounded-3xl shadow-2xl overflow-hidden w-full max-w-6xl">
+
+        <!-- Chap panel -->
+        <div class="hidden lg:flex bg-blue-600 text-white p-12 flex-col justify-center">
+
+            <h1 class="text-5xl font-bold leading-tight">
+                Xush kelibsiz!
+            </h1>
+
+            <p class="mt-6 text-lg text-blue-100 leading-8">
+                EduPlatform orqali zamonaviy kurslarni o'rganing,
+                tajribali ustozlardan bilim oling va o'z kelajagingizni bugundan boshlang.
+            </p>
+
+            <div class="mt-10 text-7xl">
+                🎓
+            </div>
+
+        </div>
+
+        <!-- O'ng panel -->
+        <div class="p-8 lg:p-14">
+
+            <h2 class="text-3xl font-bold text-slate-800">
+                Tizimga kirish
+            </h2>
+
+            <p class="text-slate-500 mt-2">
+                Hisobingizga kirish uchun ma'lumotlarni kiriting.
+            </p>
+
+            <form method="post" class="mt-8 space-y-6">
+
+                {% csrf_token %}
+
+                <div>
+                    <label class="block mb-2 font-medium">
+                        Foydalanuvchi nomi
+                    </label>
+
+                    {{ form.username }}
+                </div>
+
+                <div>
+                    <label class="block mb-2 font-medium">
+                        Parol
+                    </label>
+
+                    {{ form.password }}
+                </div>
+
+                <div class="flex items-center gap-2">
+
+                    <input
+                        id="showPassword"
+                        type="checkbox"
+                        onclick="togglePassword()">
+
+                    <label for="showPassword">
+                        Parolni ko'rsatish
+                    </label>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition">
+
+                    Kirish
+
+                </button>
+
+            </form>
+
+            <p class="mt-8 text-center text-slate-500">
+
+                Hisobingiz yo'qmi?
+
+                <a href="{% url 'users:register' %}"
+                   class="text-blue-600 font-semibold hover:underline">
+
+                    Ro'yxatdan o'tish
+
+                </a>
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function togglePassword(){
+
+    const password=document.getElementById("id_password");
+
+    if(password.type==="password"){
+        password.type="text";
+    }else{
+        password.type="password";
+    }
+
+}
+
+</script>
+
+{% endblock %}

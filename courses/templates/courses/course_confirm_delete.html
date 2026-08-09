@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Kursni o'chirish{% endblock %}
+
+{% block content %}
+
+<div class="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-10 text-center">
+
+    <div class="text-6xl mb-4">⚠️</div>
+
+    <h1 class="text-2xl font-bold text-slate-800">
+        Rostdan ham o'chirmoqchimisiz?
+    </h1>
+
+    <p class="text-slate-500 mt-3">
+        "<strong>{{ course.title }}</strong>" kursi va unga bog'liq barcha
+        darslar, talabalarning yozilishlari <strong>butunlay o'chib ketadi</strong>.
+        Bu amalni ortga qaytarib bo'lmaydi.
+    </p>
+
+    <div class="flex gap-4 mt-8 justify-center">
+
+        <form method="post">
+            {% csrf_token %}
+            <button
+                class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold transition">
+                Ha, o'chirish
+            </button>
+        </form>
+
+        <a href="{% url 'courses:teacher_dashboard' %}"
+           class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-xl font-semibold transition">
+            Bekor qilish
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

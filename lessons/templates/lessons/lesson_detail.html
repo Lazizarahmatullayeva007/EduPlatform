@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lesson.title }}{% endblock %}
+
+{% block content %}
+
+<a href="{% url 'courses:course_detail' course.slug %}"
+   class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium mb-8">
+    ← {{ course.title }} kursiga qaytish
+</a>
+
+<div class="grid lg:grid-cols-3 gap-8">
+
+    <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-8">
+
+        <h1 class="text-3xl font-bold text-slate-800">
+            {{ lesson.title }}
+        </h1>
+
+        <p class="text-slate-500 mt-2">
+            {{ lesson.get_lesson_type_display }} — {{ lesson.duration_minutes }} daqiqa
+        </p>
+
+        <div class="mt-8">
+
+            {% if lesson.lesson_type == 'video' and lesson.video_file %}
+            <div class="aspect-video bg-slate-800 rounded-xl overflow-hidden">
+                <video src="{{ lesson.video_file.url }}" controls class="w-full h-full"></video>
+            </div>
+            {% elif lesson.lesson_type == 'video' and lesson.video_url %}
+            <div class="aspect-video bg-slate-800 rounded-xl overflow-hidden">
+                <iframe src="{{ lesson.embed_video_url }}" class="w-full h-full" allowfullscreen></iframe>
+            </div>
+            {% elif lesson.text_content %}
+            <div class="text-slate-700 leading-8">
+                {{ lesson.text_content|linebreaks }}
+            </div>
+            {% else %}
+            <p class="text-slate-400">Bu dars uchun hali kontent qo'shilmagan.</p>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-lg p-6 h-fit">
+
+        <h2 class="text-lg font-semibold mb-4">Kurs darslari</h2>
+
+        <div class="space-y-2">
+            {% for l in all_lessons %}
+            <a href="{% url 'lessons:lesson_detail' course.slug l.id %}"
+               class="block p-3 rounded-lg {% if l.id == lesson.id %}bg-blue-100 text-blue-700 font-semibold{% else %}hover:bg-slate-100{% endif %}">
+                {{ forloop.counter }}. {{ l.title }}
+            </a>
+            {% endfor %}
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

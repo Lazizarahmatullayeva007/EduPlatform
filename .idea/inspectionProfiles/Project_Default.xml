@@ -1,0 +1,50 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="aiofiles" />
+          <option value="aiogram" />
+          <option value="aiohappyeyeballs" />
+          <option value="aiohttp" />
+          <option value="aiosignal" />
+          <option value="aiosqlite" />
+          <option value="annotated-types" />
+          <option value="asgiref" />
+          <option value="attrs" />
+          <option value="certifi" />
+          <option value="contourpy" />
+          <option value="cycler" />
+          <option value="Django" />
+          <option value="fonttools" />
+          <option value="frozenlist" />
+          <option value="idna" />
+          <option value="kiwisolver" />
+          <option value="magic-filter" />
+          <option value="matplotlib" />
+          <option value="multidict" />
+          <option value="numpy" />
+          <option value="packaging" />
+          <option value="pandas" />
+          <option value="pillow" />
+          <option value="propcache" />
+          <option value="pydantic" />
+          <option value="pydantic_core" />
+          <option value="pyparsing" />
+          <option value="python-dateutil" />
+          <option value="python-dotenv" />
+          <option value="six" />
+          <option value="sqlparse" />
+          <option value="typing-inspection" />
+          <option value="typing_extensions" />
+          <option value="tzdata" />
+          <option value="yarl" />
+          <option value="djangorestframework" />
+          <option value="django-filter" />
+          <option value="django-cors-headers" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

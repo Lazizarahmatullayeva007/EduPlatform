@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Yangi kurs yaratish{% endblock %}
+
+{% block content %}
+
+<a href="{% url 'courses:course_list' %}"
+   class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium mb-8">
+    ← Barcha kurslarga qaytish
+</a>
+
+<div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-10">
+
+    <h1 class="text-3xl font-bold text-slate-800">
+        {% if is_edit %}Kursni tahrirlash{% else %}Yangi kurs yaratish{% endif %}
+    </h1>
+
+    <p class="text-slate-500 mt-2 mb-8">
+        {% if is_edit %}"{{ course.title }}" kursi ma'lumotlarini yangilang.{% else %}Kurs ma'lumotlarini to'ldiring.{% endif %}
+    </p>
+
+    {% if form.errors %}
+    <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 mb-6">
+        <p class="font-semibold mb-2">Xatolik topildi:</p>
+        <ul class="list-disc list-inside">
+            {% for field in form %}
+            {% for error in field.errors %}
+            <li>{{ field.label }}: {{ error }}</li>
+            {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        <div>
+            <label class="block mb-2 font-medium text-slate-700">Kurs nomi</label>
+            {{ form.title }}
+        </div>
+
+        <div>
+            <label class="block mb-2 font-medium text-slate-700">Tavsif</label>
+            {{ form.description }}
+        </div>
+
+        <div>
+            <label class="block mb-2 font-medium text-slate-700">Kategoriya</label>
+            {{ form.category }}
+        </div>
+
+        <div>
+            <label class="block mb-2 font-medium text-slate-700">Narxi</label>
+            {{ form.price }}
+        </div>
+
+        <div>
+            <label class="block mb-2 font-medium text-slate-700">Nechta talaba qabul qilinadi</label>
+            {{ form.max_students }}
+        </div>
+
+        <div>
+            <label class="block mb-2 font-medium text-slate-700">Muqova rasmi</label>
+            <div class="bg-slate-100 rounded-xl p-4 border border-slate-200">
+                {{ form.cover_image }}
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            {{ form.is_published }}
+            <label class="font-medium text-slate-700">Darhol nashr qilish</label>
+        </div>
+
+        <button
+            type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition">
+            {% if is_edit %}Saqlash{% else %}Kursni yaratish{% endif %}
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Mening kurslarim{% endblock %}
+
+{% block content %}
+
+<div class="mb-10">
+    <h1 class="text-4xl font-bold text-slate-800">
+        Mening kurslarim
+    </h1>
+    <p class="text-slate-500 mt-2">
+        Siz yozilgan barcha kurslar shu yerda.
+    </p>
+</div>
+
+{% if enrollments %}
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+    {% for enrollment in enrollments %}
+
+    <div class="bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden">
+
+        <div class="p-6">
+
+            <h2 class="text-2xl font-bold mb-3">
+                <a href="{% url 'courses:course_detail' enrollment.course.slug %}" class="hover:text-blue-600 transition">
+                    {{ enrollment.course.title }}
+                </a>
+            </h2>
+
+            <div class="mb-4">
+                <div class="flex items-center justify-between text-sm text-slate-500 mb-1">
+                    <span>Progress</span>
+                    <span>{{ enrollment.progress_percent }}%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2">
+                    <div class="bg-blue-600 h-2 rounded-full" style="width: {{ enrollment.progress_percent }}%"></div>
+                </div>
+            </div>
+
+            {% if enrollment.is_completed %}
+                <span class="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium mb-4">
+                    ✅ Tugallangan
+                </span>
+            {% endif %}
+
+            <p class="text-slate-400 text-sm mb-4">
+                Yozilgan sana: {{ enrollment.enrolled_at|date:"d.m.Y" }}
+            </p>
+
+            <div class="flex items-center justify-between">
+
+                <a href="{% url 'courses:course_detail' enrollment.course.slug %}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl transition text-sm font-medium">
+                    Darslarni ko'rish
+                </a>
+
+                <form method="post" action="{% url 'enrollments:unenroll_course' enrollment.course.slug %}"
+                      onsubmit="return confirm('Rostdan ham bu kursdan chiqmoqchimisiz?');">
+                    {% csrf_token %}
+                    <button class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl text-sm font-medium transition">
+                        Chiqish
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="bg-white rounded-2xl shadow p-10 text-center">
+    <h2 class="text-2xl font-semibold text-slate-700">
+        Siz hali hech qanday kursga yozilmagansiz.
+    </h2>
+    <a href="{% url 'courses:course_list' %}"
+       class="inline-block mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition">
+        Kurslarni ko'rish
+    </a>
+</div>
+
+{% endif %}
+
+{% endblock %}

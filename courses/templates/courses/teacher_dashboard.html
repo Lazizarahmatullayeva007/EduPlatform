@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Mening kurslarim{% endblock %}
+
+{% block content %}
+
+<div class="flex items-center justify-between mb-8">
+
+    <div>
+        <h1 class="text-4xl font-bold text-slate-800">
+            Mening kurslarim
+        </h1>
+        <p class="text-slate-500 mt-2">
+            Yaratgan kurslaringizni shu yerdan boshqaring.
+        </p>
+    </div>
+
+    <a href="{% url 'courses:course_create' %}"
+       class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-semibold transition">
+        + Yangi kurs yaratish
+    </a>
+
+</div>
+
+<div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+
+    <table class="w-full text-left">
+        <thead class="bg-slate-100">
+        <tr>
+            <th class="px-6 py-4 text-slate-600 font-semibold">Nomi</th>
+            <th class="px-6 py-4 text-slate-600 font-semibold">Holati</th>
+            <th class="px-6 py-4 text-slate-600 font-semibold">Talabalar</th>
+            <th class="px-6 py-4 text-slate-600 font-semibold">Narxi</th>
+            <th class="px-6 py-4 text-slate-600 font-semibold">Amal</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+        {% for course in courses %}
+        <tr class="hover:bg-slate-50 transition">
+
+            <td class="px-6 py-4">
+                <a href="{% url 'courses:course_detail' course.slug %}"
+                   class="font-semibold text-blue-600 hover:text-blue-700 hover:underline">
+                    {{ course.title }}
+                </a>
+            </td>
+
+            <td class="px-6 py-4">
+                {% if course.is_published %}
+                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                                ✅ Nashr qilingan
+                            </span>
+                {% else %}
+                <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-sm font-medium">
+                                📝 Qoralama
+                            </span>
+                {% endif %}
+            </td>
+
+            <td class="px-6 py-4 text-slate-600">
+                {{ course.student_count }} ta
+            </td>
+
+            <td class="px-6 py-4 font-semibold text-slate-800">
+                {{ course.price }} so'm
+            </td>
+
+            <td class="px-6 py-4">
+                <div class="flex gap-2">
+
+                    <a href="{% url 'courses:course_edit' course.slug %}"
+                       class="bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg text-sm font-medium transition">
+                        Tahrirlash
+                    </a>
+
+                    <form method="post" action="{% url 'courses:toggle_publish' course.slug %}">
+                        {% csrf_token %}
+                        {% if course.is_published %}
+                        <button class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition">
+                            Qoralamaga qaytarish
+                        </button>
+                        {% else %}
+                        <button class="bg-green-50 hover:bg-green-100 text-green-700 px-4 py-2 rounded-lg text-sm font-medium transition">
+                            Nashr qilish
+                        </button>
+                        {% endif %}
+                    </form>
+
+                    <a href="{% url 'courses:course_delete' course.slug %}"
+                       class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-medium transition">
+                        O'chirish
+                    </a>
+
+                </div>
+            </td>
+
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="px-6 py-10 text-center text-slate-400">
+                Sizda hali kurslar yo'q.
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

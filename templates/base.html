@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EduPlatform{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body{
+            font-family:'Inter',sans-serif;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+
+<header class="bg-white shadow-sm border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="flex items-center justify-between h-16">
+
+            <a href="{% url 'courses:course_list' %}"
+               class="text-2xl font-bold text-blue-600">
+                EduPlatform
+            </a>
+
+            <nav class="flex items-center gap-6">
+
+                <a href="{% url 'courses:course_list' %}"
+                   class="font-medium hover:text-blue-600 transition">
+                    Bosh sahifa
+                </a>
+
+                {% if user.is_authenticated %}
+
+                {% if user.role == 'teacher' %}
+                <a href="{% url 'courses:teacher_dashboard' %}" class="font-medium hover:text-blue-600 transition">
+                    Mening kurslarim
+                </a>
+                {% elif user.role == 'student' %}
+                <a href="{% url 'enrollments:my_enrollments' %}" class="font-medium hover:text-blue-600 transition">
+                    Mening kurslarim
+                </a>
+                {% endif %}
+
+                <a href="{% url 'users:profile' %}" class="font-medium hover:text-blue-600 transition">
+                    Profil
+                </a>
+
+                <span class="text-slate-500">
+                {{ user.username }}
+                </span>
+
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button
+                            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl transition">
+                        Chiqish
+                    </button>
+                </form>
+
+                {% else %}
+
+                <a href="{% url 'login' %}"
+                   class="font-medium hover:text-blue-600 transition">
+                    Kirish
+                </a>
+
+                <a href="{% url 'users:register' %}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl transition">
+                    Ro'yxatdan o'tish
+                </a>
+
+                {% endif %}
+
+            </nav>
+
+        </div>
+
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-6 py-8">
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="mb-4 rounded-xl bg-green-100 border border-green-300 px-4 py-3 text-green-700">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+
+</main>
+
+<footer class="border-t bg-white mt-20">
+    <div class="max-w-7xl mx-auto px-6 py-8 text-center text-slate-500">
+
+        © 2026 EduPlatform. Barcha huquqlar himoyalangan.
+
+    </div>
+</footer>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>
