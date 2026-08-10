@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from django.db import transaction
 from django.conf import settings
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -88,6 +89,13 @@ def simulate_payment_success(request, transaction_id):
     HAQIQIY loyihada bu funksiya BO'LMAYDI - buning o'rniga
     talaba Payme sahifasida to'laydi, Payme esa payment_webhook'ga
     xabar yuboradi. Bu - faqat OQIMNI KO'RSATISH uchun simulyatsiya.
+
+    transaction.atomic() - to'lov holatini yangilash VA kursga yozish
+    bitta "bo'linmas" amal sifatida bajariladi. Agar ikkinchi qadam
+    (Enrollment yaratish) muvaffaqiyatsiz bo'lsa, birinchi qadam
+    (payment.save()) ham AVTOMATIK bekor qilinadi - shunday qilib
+    "to'lov qilingan, lekin kursga yozilmagan" degan noto'g'ri holat
+    hech qachon yuzaga kelmaydi.
     """
     if request.method != 'POST':
         return redirect('courses:course_list')
@@ -95,10 +103,11 @@ def simulate_payment_success(request, transaction_id):
     payment = get_object_or_404(Payment, transaction_id=transaction_id, student=request.user)
 
     if payment.status != 'paid':
-        payment.status = 'paid'
-        payment.paid_at = timezone.now()
-        payment.save()
-        Enrollment.objects.get_or_create(student=payment.student, course=payment.course)
+        with transaction.atomic():
+            payment.status = 'paid'
+            payment.paid_at = timezone.now()
+            payment.save()
+            Enrollment.objects.get_or_create(student=payment.student, course=payment.course)
 
     messages.success(request, f"To'lov muvaffaqiyatli! '{payment.course.title}' kursiga yozildingiz.")
     return redirect('courses:course_detail', slug=payment.course.slug)

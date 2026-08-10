@@ -16,12 +16,16 @@ from .filters import CourseFilter
 
 
 def course_list(request):
-    courses = Course.objects.filter(is_published=True)
+    courses = Course.objects.filter(is_published=True).select_related('teacher', 'category')
     return render(request, 'courses/course_list.html', {'courses': courses})
 
 
 def course_detail(request, slug):
-    course = get_object_or_404(Course, slug=slug, is_published=True)
+    course = get_object_or_404(
+        Course.objects.select_related('teacher', 'category').prefetch_related('lessons', 'comments__author'),
+        slug=slug,
+        is_published=True
+    )
 
     is_enrolled = False
     if request.user.is_authenticated:
