@@ -1,4 +1,3 @@
-<!-- lessons/templates/lessons/lesson_form.html -->
 {% extends 'base.html' %}
 
 {% block title %}Dars qo'shish{% endblock %}
@@ -6,22 +5,22 @@
 {% block content %}
 
 <a href="{% url 'courses:course_detail' course.slug %}"
-   class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium mb-8">
+   class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium mb-8 transition">
     ← {{ course.title }} kursiga qaytish
 </a>
 
-<div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-10">
+<div class="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700/60 p-8 sm:p-10 transition-colors duration-300">
 
-    <h1 class="text-3xl font-bold text-slate-800">
+    <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">
         Yangi dars qo'shish
     </h1>
 
-    <p class="text-slate-500 mt-2 mb-8">
+    <p class="text-slate-500 dark:text-slate-400 mt-2 mb-8">
         "{{ course.title }}" kursiga dars qo'shyapsiz.
     </p>
 
     {% if form.errors %}
-    <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 mb-6">
+    <div class="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl p-4 mb-6">
         <p class="font-semibold mb-2">Xatolik topildi:</p>
         <ul class="list-disc list-inside">
             {% for field in form %}
@@ -37,54 +36,51 @@
         {% csrf_token %}
 
         <div>
-            <label class="block mb-2 font-medium text-slate-700">Dars nomi</label>
+            <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Dars nomi</label>
             {{ form.title }}
         </div>
 
         <div>
-            <label class="block mb-2 font-medium text-slate-700">Turi</label>
+            <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Turi</label>
             {{ form.lesson_type }}
         </div>
 
         <div>
-            <label class="block mb-2 font-medium text-slate-700">Video havolasi (YouTube va h.k.)</label>
+            <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Video havolasi (YouTube va h.k.)</label>
             {{ form.video_url }}
         </div>
 
         <div>
-            <label class="block mb-2 font-medium text-slate-700">Yoki video fayl yuklang</label>
-            <div class="bg-slate-100 rounded-xl p-4 border border-slate-200">
+            <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Yoki video fayl yuklang</label>
+            <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200">
                 {{ form.video_file }}
             </div>
         </div>
 
         <div>
-            <label class="block mb-2 font-medium text-slate-700">Matn kontenti (agar matn bo'lsa)</label>
+            <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Matn kontenti (agar matn bo'lsa)</label>
             {{ form.text_content }}
         </div>
 
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block mb-2 font-medium text-slate-700">Tartib raqami</label>
+                <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Tartib raqami</label>
                 {{ form.order }}
             </div>
 
             <div>
-                <label class="block mb-2 font-medium text-slate-700">Davomiyligi (daqiqa)</label>
+                <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Davomiyligi (daqiqa)</label>
                 {{ form.duration_minutes }}
-                <p class="text-slate-400 text-sm mt-1">
-                    💡 Video fayl yuklasangiz — avtomatik. YouTube link uchun — o'zingiz kiriting.
-                </p>
             </div>
-
-            <p class="text-slate-400 text-sm">
-                💡 Video davomiyligi avtomatik aniqlanadi (agar video fayl yuklasangiz).
-            </p>
         </div>
+
+        <p class="text-slate-400 dark:text-slate-500 text-sm">
+            💡 Video davomiyligi fayl yuklanganda avtomatik aniqlanadi. YouTube link uchun qo'lda kiriting.
+        </p>
 
         <button
                 type="submit"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition">
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition shadow-md hover:shadow-lg">
             Darsni qo'shish
         </button>
 

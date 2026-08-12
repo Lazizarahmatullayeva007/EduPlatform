@@ -1,13 +1,16 @@
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth.views import LoginView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+from users.forms import LoginForm
+from courses.views import home_view
 
 urlpatterns = [
-    path('', RedirectView.as_view(pattern_name='courses:course_list'), name='home'),
+    path('', home_view, name='home'),
     path('admin/', admin.site.urls),
+    path('accounts/login/', LoginView.as_view(authentication_form=LoginForm), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('users.urls')),
     path('courses/', include('courses.urls')),

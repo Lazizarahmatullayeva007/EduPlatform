@@ -4,15 +4,15 @@
 
 {% block content %}
 
-<div class="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-10 text-center">
+<div class="max-w-xl mx-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-2xl shadow-lg p-10 text-center transition-colors duration-300">
 
     <div class="text-6xl mb-4">⚠️</div>
 
-    <h1 class="text-2xl font-bold text-slate-800">
+    <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">
         Rostdan ham o'chirmoqchimisiz?
     </h1>
 
-    <p class="text-slate-500 mt-3">
+    <p class="text-slate-500 dark:text-slate-400 mt-3 leading-relaxed">
         "<strong>{{ course.title }}</strong>" kursi va unga bog'liq barcha
         darslar, talabalarning yozilishlari <strong>butunlay o'chib ketadi</strong>.
         Bu amalni ortga qaytarib bo'lmaydi.
@@ -23,13 +23,13 @@
         <form method="post">
             {% csrf_token %}
             <button
-                class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold transition">
+                class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold transition shadow">
                 Ha, o'chirish
             </button>
         </form>
 
         <a href="{% url 'courses:teacher_dashboard' %}"
-           class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-xl font-semibold transition">
+           class="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-6 py-3 rounded-xl font-semibold transition">
             Bekor qilish
         </a>
 

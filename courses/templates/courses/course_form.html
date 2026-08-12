@@ -1,26 +1,26 @@
 {% extends 'base.html' %}
 
-{% block title %}Yangi kurs yaratish{% endblock %}
+{% block title %}{% if is_edit %}Kursni tahrirlash{% else %}Yangi kurs yaratish{% endif %}{% endblock %}
 
 {% block content %}
 
 <a href="{% url 'courses:course_list' %}"
-   class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium mb-8">
+   class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium mb-8 transition">
     ← Barcha kurslarga qaytish
 </a>
 
-<div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-10">
+<div class="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700/60 p-8 sm:p-10 transition-colors duration-300">
 
-    <h1 class="text-3xl font-bold text-slate-800">
+    <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">
         {% if is_edit %}Kursni tahrirlash{% else %}Yangi kurs yaratish{% endif %}
     </h1>
 
-    <p class="text-slate-500 mt-2 mb-8">
+    <p class="text-slate-500 dark:text-slate-400 mt-2 mb-8">
         {% if is_edit %}"{{ course.title }}" kursi ma'lumotlarini yangilang.{% else %}Kurs ma'lumotlarini to'ldiring.{% endif %}
     </p>
 
     {% if form.errors %}
-    <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 mb-6">
+    <div class="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl p-4 mb-6">
         <p class="font-semibold mb-2">Xatolik topildi:</p>
         <ul class="list-disc list-inside">
             {% for field in form %}
@@ -39,45 +39,45 @@
         {% csrf_token %}
 
         <div>
-            <label class="block mb-2 font-medium text-slate-700">Kurs nomi</label>
+            <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Kurs nomi</label>
             {{ form.title }}
         </div>
 
         <div>
-            <label class="block mb-2 font-medium text-slate-700">Tavsif</label>
+            <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Tavsif</label>
             {{ form.description }}
         </div>
 
         <div>
-            <label class="block mb-2 font-medium text-slate-700">Kategoriya</label>
+            <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Kategoriya</label>
             {{ form.category }}
         </div>
 
         <div>
-            <label class="block mb-2 font-medium text-slate-700">Narxi</label>
+            <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Narxi</label>
             {{ form.price }}
         </div>
 
         <div>
-            <label class="block mb-2 font-medium text-slate-700">Nechta talaba qabul qilinadi</label>
+            <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Nechta talaba qabul qilinadi</label>
             {{ form.max_students }}
         </div>
 
         <div>
-            <label class="block mb-2 font-medium text-slate-700">Muqova rasmi</label>
-            <div class="bg-slate-100 rounded-xl p-4 border border-slate-200">
+            <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Muqova rasmi</label>
+            <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200">
                 {{ form.cover_image }}
             </div>
         </div>
 
         <div class="flex items-center gap-3">
             {{ form.is_published }}
-            <label class="font-medium text-slate-700">Darhol nashr qilish</label>
+            <label class="font-medium text-slate-700 dark:text-slate-200">Darhol nashr qilish</label>
         </div>
 
         <button
             type="submit"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition">
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition shadow-md hover:shadow-lg">
             {% if is_edit %}Saqlash{% else %}Kursni yaratish{% endif %}
         </button>
 

@@ -1,178 +1,69 @@
 {% extends 'base.html' %}
 
-{% block title %}EduPlatform{% endblock %}
+{% block title %}EduPlatform — Online Ta'lim Platformasi{% endblock %}
 
 {% block content %}
+<div class="min-h-[75vh] flex items-center justify-center py-6">
 
-<section class="py-20">
+    <!-- HERO BANNER (Birinchi sahifa oyna banneri) -->
+    <div class="w-full relative overflow-hidden rounded-3xl p-8 sm:p-14 text-center transition-all duration-300 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white shadow-2xl dark:from-slate-900 dark:via-blue-950 dark:to-slate-900 dark:border dark:border-blue-500/30">
 
-    <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <!-- Orqa fon effektlari (Glow / Blur Circles) -->
+        <div class="absolute -top-24 -left-24 w-72 h-72 bg-blue-400/20 dark:bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-indigo-400/20 dark:bg-sky-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div>
+        <div class="relative z-10 max-w-4xl mx-auto">
 
-            <span class="bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-semibold">
-                🚀 Online Learning Platform
-            </span>
+            <!-- Top Pill Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 dark:bg-blue-500/20 border border-white/20 dark:border-blue-400/30 text-blue-100 dark:text-blue-300 text-xs sm:text-sm font-semibold tracking-wider backdrop-blur-md mb-6 shadow-sm">
+                <span>✦</span>
+                <span>PYTHON • DJANGO • WEB DASTURLASH • AI</span>
+            </div>
 
-            <h1 class="text-6xl font-extrabold mt-8 leading-tight">
-
-                Kelajagingizni
-                <span class="text-blue-600">
-                    bugundan
+            <!-- Asosiy Sarlavha (EduPlatform) -->
+            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight">
+                Kelajak Kasblarini
+                <span class="block mt-2 bg-gradient-to-r from-blue-200 via-sky-300 to-indigo-200 dark:from-blue-400 dark:via-sky-300 dark:to-blue-200 bg-clip-text text-transparent">
+                    EduPlatform Bilan O'rganing
                 </span>
-                boshlang.
-
             </h1>
 
-            <p class="text-slate-600 mt-8 text-xl leading-9">
-
-                Tajribali ustozlardan zamonaviy kasblarni o'rganing.
-                Python, Web Dasturlash, Sun'iy Intellekt va boshqa ko'plab
-                yo'nalishlar sizni kutmoqda.
-
+            <!-- Loyiha haqida qisqacha izoh -->
+            <p class="mt-6 text-base sm:text-lg text-blue-100/90 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                EduPlatform — Python, Django, Sun'iy Intellekt va zamonaviy veb-dasturlash bo'yicha amaliy kurslar va tajribali ustozlar yordamida o'z kelajagingizni qurish platformasi.
             </p>
 
-            <div class="mt-10 flex gap-5">
-
+            <!-- Harakat tugmasi (Kurslarni Ko'rish tugmasi bosilganda /courses/ sahifasi ochiladi) -->
+            <div class="mt-8">
                 <a href="{% url 'courses:course_list' %}"
-                   class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold transition">
-
-                    Kurslarni ko'rish
-
+                   class="inline-flex items-center justify-center px-8 py-3.5 rounded-xl font-bold text-white bg-blue-500 hover:bg-blue-400 dark:bg-blue-600 dark:hover:bg-blue-500 shadow-lg shadow-blue-900/30 hover:shadow-blue-500/40 transition-all transform hover:-translate-y-0.5 text-base sm:text-lg">
+                    Kurslarni Ko'rish →
                 </a>
-
-                {% if not user.is_authenticated %}
-
-                <a href="{% url 'users:register' %}"
-                   class="border border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-4 rounded-xl font-semibold transition">
-
-                    Boshlash
-
-                </a>
-
-                {% endif %}
-
             </div>
 
-        </div>
+            <!-- Statistika Kartalari (Stat Cards - 3 ta) -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-12 max-w-3xl mx-auto">
 
-        <div class="hidden lg:flex justify-center">
-
-            <div class="w-96 h-96 rounded-full bg-blue-600 flex items-center justify-center text-9xl text-white shadow-2xl">
-
-                🎓
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-<section class="py-16">
-
-    <h2 class="text-4xl font-bold mb-10">
-
-        So'nggi kurslar
-
-    </h2>
-
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-        {% for course in courses %}
-
-        <div class="bg-white rounded-2xl shadow hover:shadow-xl transition overflow-hidden">
-
-            {% if course.cover_image %}
-
-                <img src="{{ course.cover_image.url }}"
-                     class="h-52 w-full object-cover">
-
-            {% else %}
-
-                <div class="h-52 bg-blue-600 flex items-center justify-center text-6xl">
-
-                    📘
-
+                <div class="bg-white/10 dark:bg-slate-800/80 backdrop-blur-md border border-white/15 dark:border-slate-700/70 rounded-2xl p-5 text-center transition-all duration-300 hover:scale-105 shadow-sm">
+                    <h3 class="text-3xl sm:text-4xl font-extrabold text-white dark:text-blue-400">100+</h3>
+                    <p class="text-xs sm:text-sm font-medium text-blue-100/80 dark:text-slate-400 mt-1">Sifatli Darslar</p>
                 </div>
 
-            {% endif %}
+                <div class="bg-white/10 dark:bg-slate-800/80 backdrop-blur-md border border-white/15 dark:border-slate-700/70 rounded-2xl p-5 text-center transition-all duration-300 hover:scale-105 shadow-sm">
+                    <h3 class="text-3xl sm:text-4xl font-extrabold text-white dark:text-blue-400">50+</h3>
+                    <p class="text-xs sm:text-sm font-medium text-blue-100/80 dark:text-slate-400 mt-1">Interaktiv Kurslar</p>
+                </div>
 
-            <div class="p-6">
-
-                <h3 class="text-2xl font-bold">
-
-                    {{ course.title }}
-
-                </h3>
-
-                <p class="text-slate-500 mt-3">
-
-                    {{ course.description|truncatewords:12 }}
-
-                </p>
-
-                <div class="mt-6 flex justify-between items-center">
-
-                    <span class="text-blue-600 font-bold text-xl">
-
-                        {{ course.price }} so'm
-
-                    </span>
-
-                    <a href="{% url 'courses:course_detail' course.slug %}"
-                       class="text-blue-600 font-semibold">
-
-                        Batafsil →
-
-                    </a>
-
+                <div class="bg-white/10 dark:bg-slate-800/80 backdrop-blur-md border border-white/15 dark:border-slate-700/70 rounded-2xl p-5 text-center transition-all duration-300 hover:scale-105 shadow-sm">
+                    <h3 class="text-3xl sm:text-4xl font-extrabold text-white dark:text-blue-400">100%</h3>
+                    <p class="text-xs sm:text-sm font-medium text-blue-100/80 dark:text-slate-400 mt-1">Amaliy Tajriba</p>
                 </div>
 
             </div>
 
         </div>
 
-        {% empty %}
-
-            <p>Kurslar hali mavjud emas.</p>
-
-        {% endfor %}
-
     </div>
 
-</section>
-
-<section class="py-20">
-
-    <div class="bg-blue-600 rounded-3xl text-white p-14 text-center">
-
-        <h2 class="text-4xl font-bold">
-
-            Bilim olishni bugundan boshlang!
-
-        </h2>
-
-        <p class="mt-5 text-blue-100 text-lg">
-
-            Minglab talabalar EduPlatform orqali yangi kasblarni egallamoqda.
-
-        </p>
-
-        {% if not user.is_authenticated %}
-
-        <a href="{% url 'users:register' %}"
-           class="inline-block mt-8 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-slate-100 transition">
-
-            Ro'yxatdan o'tish
-
-        </a>
-
-        {% endif %}
-
-    </div>
-
-</section>
-
+</div>
 {% endblock %}

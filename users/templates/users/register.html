@@ -6,10 +6,10 @@
 
 <div class="min-h-[80vh] flex items-center justify-center">
 
-    <div class="grid lg:grid-cols-2 bg-white rounded-3xl shadow-2xl overflow-hidden w-full max-w-6xl">
+    <div class="grid lg:grid-cols-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-3xl shadow-2xl overflow-hidden w-full max-w-6xl transition-colors duration-300">
 
         <!-- Chap panel -->
-        <div class="hidden lg:flex bg-blue-600 text-white p-12 flex-col justify-center">
+        <div class="hidden lg:flex bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-12 flex-col justify-center">
 
             <h1 class="text-5xl font-bold leading-tight">
                 EduPlatform
@@ -29,11 +29,11 @@
         <!-- O'ng panel -->
         <div class="p-8 lg:p-14">
 
-            <h2 class="text-3xl font-bold text-slate-800">
+            <h2 class="text-3xl font-bold text-slate-800 dark:text-slate-100">
                 Ro'yxatdan o'tish
             </h2>
 
-            <p class="text-slate-500 mt-2">
+            <p class="text-slate-500 dark:text-slate-400 mt-2">
                 Quyidagi ma'lumotlarni to'ldiring.
             </p>
 
@@ -42,38 +42,39 @@
                 {% csrf_token %}
 
                 <div>
-                    <label class="block mb-2 font-medium">Foydalanuvchi nomi</label>
+                    <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Foydalanuvchi nomi</label>
                     {{ form.username }}
                 </div>
 
                 <div>
-                    <label class="block mb-2 font-medium">Email</label>
+                    <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Email</label>
                     {{ form.email }}
                 </div>
 
                 <div>
-                    <label class="block mb-2 font-medium">Rol</label>
+                    <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Rol</label>
                     {{ form.role }}
                 </div>
 
                 <div>
-                    <label class="block mb-2 font-medium">Parol</label>
+                    <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Parol</label>
                     {{ form.password1 }}
                 </div>
 
                 <div>
-                    <label class="block mb-2 font-medium">Parolni tasdiqlang</label>
+                    <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">Parolni tasdiqlang</label>
                     {{ form.password2 }}
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 text-slate-700 dark:text-slate-300">
 
                     <input
                         type="checkbox"
                         id="showPassword"
+                        class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 dark:bg-slate-700 dark:border-slate-600"
                         onclick="togglePasswords()">
 
-                    <label for="showPassword">
+                    <label for="showPassword" class="text-sm font-medium">
                         Parollarni ko'rsatish
                     </label>
 
@@ -81,7 +82,7 @@
 
                 <button
                     type="submit"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition">
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition shadow-md hover:shadow-lg">
 
                     Ro'yxatdan o'tish
 
@@ -89,12 +90,12 @@
 
             </form>
 
-            <p class="mt-8 text-center text-slate-500">
+            <p class="mt-8 text-center text-slate-500 dark:text-slate-400 text-sm">
 
                 Hisobingiz bormi?
 
                 <a href="{% url 'login' %}"
-                   class="text-blue-600 font-semibold hover:underline">
+                   class="text-blue-600 dark:text-blue-400 font-semibold hover:underline">
 
                     Tizimga kirish
 

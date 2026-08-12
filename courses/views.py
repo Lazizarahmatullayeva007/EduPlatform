@@ -15,9 +15,16 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .filters import CourseFilter
 
 
+def home_view(request):
+    if request.user.is_authenticated:
+        return redirect('courses:course_list')
+    return render(request, 'home.html')
+
+
 def course_list(request):
     courses = Course.objects.filter(is_published=True).select_related('teacher', 'category')
     return render(request, 'courses/course_list.html', {'courses': courses})
+
 
 
 def course_detail(request, slug):

@@ -5,52 +5,52 @@
 {% block content %}
 
 <a href="{% url 'courses:course_detail' course.slug %}"
-   class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium mb-8">
+   class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium mb-8 transition">
     ← {{ course.title }} kursiga qaytish
 </a>
 
 <div class="grid lg:grid-cols-3 gap-8">
 
-    <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-8">
+    <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700/60 p-8 transition-colors duration-300">
 
-        <h1 class="text-3xl font-bold text-slate-800">
+        <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">
             {{ lesson.title }}
         </h1>
 
-        <p class="text-slate-500 mt-2">
-            {{ lesson.get_lesson_type_display }} — {{ lesson.duration_minutes }} daqiqa
+        <p class="text-slate-500 dark:text-slate-400 mt-2 text-sm">
+            {{ lesson.get_lesson_type_display }} • {{ lesson.duration_minutes }} daqiqa
         </p>
 
         <div class="mt-8">
 
             {% if lesson.lesson_type == 'video' and lesson.video_file %}
-            <div class="aspect-video bg-slate-800 rounded-xl overflow-hidden">
+            <div class="aspect-video bg-slate-900 rounded-xl overflow-hidden shadow-md border border-slate-800">
                 <video src="{{ lesson.video_file.url }}" controls class="w-full h-full"></video>
             </div>
             {% elif lesson.lesson_type == 'video' and lesson.video_url %}
-            <div class="aspect-video bg-slate-800 rounded-xl overflow-hidden">
+            <div class="aspect-video bg-slate-900 rounded-xl overflow-hidden shadow-md border border-slate-800">
                 <iframe src="{{ lesson.embed_video_url }}" class="w-full h-full" allowfullscreen></iframe>
             </div>
             {% elif lesson.text_content %}
-            <div class="text-slate-700 leading-8">
+            <div class="text-slate-700 dark:text-slate-200 leading-8 prose dark:prose-invert max-w-none">
                 {{ lesson.text_content|linebreaks }}
             </div>
             {% else %}
-            <p class="text-slate-400">Bu dars uchun hali kontent qo'shilmagan.</p>
+            <p class="text-slate-400 dark:text-slate-500">Bu dars uchun hali kontent qo'shilmagan.</p>
             {% endif %}
 
         </div>
 
     </div>
 
-    <div class="bg-white rounded-2xl shadow-lg p-6 h-fit">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700/60 p-6 h-fit transition-colors duration-300">
 
-        <h2 class="text-lg font-semibold mb-4">Kurs darslari</h2>
+        <h2 class="text-lg font-semibold mb-4 text-slate-900 dark:text-slate-100">Kurs darslari</h2>
 
         <div class="space-y-2">
             {% for l in all_lessons %}
             <a href="{% url 'lessons:lesson_detail' course.slug l.id %}"
-               class="block p-3 rounded-lg {% if l.id == lesson.id %}bg-blue-100 text-blue-700 font-semibold{% else %}hover:bg-slate-100{% endif %}">
+               class="block p-3 rounded-lg transition text-sm {% if l.id == lesson.id %}bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-semibold{% else %}text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50{% endif %}">
                 {{ forloop.counter }}. {{ l.title }}
             </a>
             {% endfor %}
