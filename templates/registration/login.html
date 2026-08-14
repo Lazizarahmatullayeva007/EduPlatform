@@ -41,6 +41,19 @@
 
                 {% csrf_token %}
 
+                {% if form.errors %}
+                    <div class="bg-red-50 dark:bg-red-900/40 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 rounded-xl p-4 mb-4 text-xs space-y-1">
+                        {% if form.non_field_errors %}
+                            {% for error in form.non_field_errors %}
+                                <p class="font-medium">⚠️ {{ error }}</p>
+                            {% endfor %}
+                        {% else %}
+                            <p class="font-medium">⚠️ Foydalanuvchi nomi yoki parol noto'g'ri!</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+
                 <div>
                     <label class="block mb-2 font-medium text-slate-700 dark:text-slate-200">
                         Foydalanuvchi nomi

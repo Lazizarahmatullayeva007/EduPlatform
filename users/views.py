@@ -19,11 +19,15 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+            messages.success(request, f"Xush kelibsiz, {user.username}! Ro'yxatdan muvaffaqiyatli o'tdingiz.")
             return redirect('courses:course_list')
+        else:
+            messages.error(request, "Ro'yxatdan o'tishda xatolik yuz berdi. Ma'lumotlarni tekshirib qayta kiriting.")
     else:
         form = RegisterForm()
 
     return render(request, 'users/register.html', {'form': form})
+
 
 
 @login_required

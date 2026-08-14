@@ -29,6 +29,7 @@ class LoginForm(AuthenticationForm):
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(
+        required=True,
         widget=forms.EmailInput(attrs={
             "class": INPUT_CLASSES,
             "placeholder": "Email"
@@ -42,30 +43,28 @@ class RegisterForm(UserCreationForm):
         })
     )
 
-    password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            "class": INPUT_CLASSES,
-            "placeholder": "Parol"
-        })
-    )
-
-    password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            "class": INPUT_CLASSES,
-            "placeholder": "Parolni tasdiqlang"
-        })
-    )
-
-    class Meta:
+    class Meta(UserCreationForm.Meta):
         model = User
-        fields = ["username", "email", "role", "password1", "password2"]
+        fields = ["username", "email", "role"]
 
-        widgets = {
-            "username": forms.TextInput(attrs={
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'username' in self.fields:
+            self.fields['username'].widget.attrs.update({
                 "class": INPUT_CLASSES,
                 "placeholder": "Foydalanuvchi nomi"
-            }),
-        }
+            })
+        if 'password1' in self.fields:
+            self.fields['password1'].widget.attrs.update({
+                "class": INPUT_CLASSES,
+                "placeholder": "Parol"
+            })
+        if 'password2' in self.fields:
+            self.fields['password2'].widget.attrs.update({
+                "class": INPUT_CLASSES,
+                "placeholder": "Parolni tasdiqlang"
+            })
+
 
 
 COMPACT_INPUT_CLASSES = (
