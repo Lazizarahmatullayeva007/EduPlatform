@@ -5,8 +5,9 @@ from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
 from courses.models import Course
+from enrollments.models import Enrollment
 from users.decorators import teacher_required
-from .models import Lesson
+from .models import Lesson, LessonCompletion
 from .serializers import LessonSerializer
 from .forms import LessonForm
 
@@ -29,11 +30,64 @@ def lesson_detail(request, course_slug, lesson_id):
 
     all_lessons = course.lessons.all().order_by('order')
 
+    completed_lesson_ids = set()
+    is_completed = False
+    if request.user.is_authenticated:
+        completed_lesson_ids = set(
+            LessonCompletion.objects.filter(
+                student=request.user,
+                lesson__course=course
+            ).values_list('lesson_id', flat=True)
+        )
+        is_completed = lesson.id in completed_lesson_ids
+
     return render(request, 'lessons/lesson_detail.html', {
         'lesson': lesson,
         'course': course,
         'all_lessons': all_lessons,
+        'is_completed': is_completed,
+        'completed_lesson_ids': completed_lesson_ids,
     })
+
+
+@login_required
+def complete_lesson(request, course_slug, lesson_id):
+    """
+    Darsni muvaffaqiyatli yakunlash va progress_percent'ni yangilash.
+    """
+    if request.method == 'POST':
+        lesson = get_object_or_404(Lesson, id=lesson_id, course__slug=course_slug)
+        course = lesson.course
+
+        enrollment = Enrollment.objects.filter(student=request.user, course=course).first()
+        is_teacher = course.teacher == request.user
+
+        if not (enrollment or is_teacher):
+            return render(request, 'lessons/lesson_forbidden.html', {'course': course}, status=403)
+
+        LessonCompletion.objects.get_or_create(
+            student=request.user,
+            lesson=lesson
+        )
+
+        if enrollment:
+            total_lessons = course.lessons.count()
+            completed_count = LessonCompletion.objects.filter(
+                student=request.user,
+                lesson__course=course
+            ).count()
+
+            progress = int((completed_count / total_lessons) * 100) if total_lessons > 0 else 100
+            if progress > 100:
+                progress = 100
+
+            enrollment.progress_percent = progress
+            enrollment.save()
+
+        messages.success(request, "Siz darsni muvaffaqiyatli yakunladingiz")
+
+    return redirect('lessons:lesson_detail', course_slug=course_slug, lesson_id=lesson_id)
+
 
 
 @login_required

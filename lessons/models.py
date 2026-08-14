@@ -51,16 +51,36 @@ class Lesson(models.Model):
             except Exception:
                 pass
 
-
-@property
-def embed_video_url(self):
-    if not self.video_url:
-        return ''
+    @property
+    def embed_video_url(self):
+        if not self.video_url:
+            return ''
         url = self.video_url
-    if 'youtu.be/' in url:
-        video_id = url.split('youtu.be/')[-1].split('?')[0]
-        return f'https://www.youtube.com/embed/{video_id}'
-    if 'watch?v=' in url:
-        video_id = url.split('watch?v=')[-1].split('&')[0]
-        return f'https://www.youtube.com/embed/{video_id}'
-    return url
+        if 'youtu.be/' in url:
+            video_id = url.split('youtu.be/')[-1].split('?')[0]
+            return f'https://www.youtube.com/embed/{video_id}'
+        if 'watch?v=' in url:
+            video_id = url.split('watch?v=')[-1].split('&')[0]
+            return f'https://www.youtube.com/embed/{video_id}'
+        return url
+
+
+class LessonCompletion(models.Model):
+    student = models.ForeignKey(
+        'users.User',
+        on_delete=models.CASCADE,
+        related_name='lesson_completions'
+    )
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name='completions'
+    )
+    completed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('student', 'lesson')
+
+    def __str__(self):
+        return f"{self.student.username} -> {self.lesson.title}"
+
