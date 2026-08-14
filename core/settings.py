@@ -42,6 +42,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+    'https://eduplatform-4i5f.onrender.com',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
+
 
 # Application definition
 
