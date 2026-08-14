@@ -40,7 +40,8 @@ ESKIZ_PASSWORD = config('ESKIZ_PASSWORD', default='')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,testserver').split(',')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
+
 
 # Application definition
 
