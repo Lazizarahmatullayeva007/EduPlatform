@@ -32,8 +32,10 @@ class Course(models.Model):
         Category,
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         related_name='courses'
     )
+
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     cover_image = models.ImageField(upload_to='courses/covers/', blank=True, null=True)
     max_students = models.PositiveIntegerField(default=30)
