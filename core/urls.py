@@ -9,8 +9,11 @@ from users.forms import LoginForm
 from courses.views import home_view
 
 urlpatterns = [
+    # Bosh sahifa va Admin
     path('', home_view, name='home'),
     path('admin/', admin.site.urls),
+
+    # Web ilova (HTML Templates)
     path('accounts/login/', LoginView.as_view(authentication_form=LoginForm), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('users.urls')),
@@ -18,14 +21,19 @@ urlpatterns = [
     path('enrollments/', include('enrollments.urls')),
     path('lessons/', include('lessons.urls')),
 
+    # Yagona API marshruti (/api/ -> DRF API Root, Kurslar, Darslar, To'lovlar, Swagger Docs)
+    path('api/', include('core.api_urls')),
+
+    # Autentifikatsiya (Djoser & SimpleJWT)
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
 
+    # OpenAPI Sxemasi va Hujjatlar
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
-    # Media files serving for both development and production (Render / Gunicorn)
+    # Media fayllarni serverda (Render/Gunicorn) to'g'ridan-to'g'ri ko'rsatish
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
 
