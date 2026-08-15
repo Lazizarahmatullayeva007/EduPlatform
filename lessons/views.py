@@ -131,11 +131,76 @@ def lesson_delete(request, course_slug, lesson_id):
     return render(request, 'lessons/lesson_confirm_delete.html', {'lesson': lesson})
 
 
+from django.db.models import Q
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.decorators import action
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from .permissions import IsLessonTeacherOrReadOnly
+
+
+@extend_schema_view(
+    list=extend_schema(tags=['Darslar'], summary='Darslar ro\'yxati'),
+    retrieve=extend_schema(tags=['Darslar'], summary='Dars tafsilotlari'),
+    create=extend_schema(tags=['Darslar'], summary='Kursga yangi dars qo\'shish (faqat o\'qituvchi)'),
+    update=extend_schema(tags=['Darslar'], summary='Darsni to\'liq yangilash'),
+    partial_update=extend_schema(tags=['Darslar'], summary='Darsni qisman yangilash'),
+    destroy=extend_schema(tags=['Darslar'], summary='Darsni o\'chirish'),
+)
 class LessonViewSet(viewsets.ModelViewSet):
-    queryset = Lesson.objects.filter(course__is_published=True)
     serializer_class = LessonSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsLessonTeacherOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     filterset_fields = ['course', 'lesson_type']
-    ordering_fields = ['order', 'duration_minutes']
+    search_fields = ['title', 'text_content']
+    ordering_fields = ['order', 'duration_minutes', 'created_at']
     ordering = ['order']
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated:
+            if getattr(user, 'role', '') == 'teacher' or user.is_staff:
+                return Lesson.objects.filter(
+                    Q(course__is_published=True) | Q(course__teacher=user)
+                ).select_related('course')
+        return Lesson.objects.filter(course__is_published=True).select_related('course')
+
+    def perform_create(self, serializer):
+        course = serializer.validated_data.get('course')
+        if course.teacher != self.request.user and not self.request.user.is_staff:
+            raise PermissionDenied("Faqat kurs muallifi ushbu kursga dars qo'sha oladi.")
+        serializer.save()
+
+    @extend_schema(
+        tags=['Darslar'],
+        summary='Darsni yakunlash (Talaba uchun)',
+        responses={200: {"type": "object", "properties": {"message": {"type": "string"}, "progress": {"type": "integer"}}}}
+    )
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticatedOrReadOnly])
+    def complete(self, request, pk=None):
+        if not request.user.is_authenticated:
+            return Response({"error": "Avval tizimga kiring"}, status=401)
+        lesson = self.get_object()
+        course = lesson.course
+
+        enrollment = Enrollment.objects.filter(student=request.user, course=course).first()
+        is_teacher = course.teacher == request.user
+
+        if not (enrollment or is_teacher or request.user.is_staff):
+            return Response({"error": "Siz ushbu kursga yozilmagansiz"}, status=403)
+
+        LessonCompletion.objects.get_or_create(student=request.user, lesson=lesson)
+
+        progress = 0
+        if enrollment:
+            total_lessons = course.lessons.count()
+            completed_count = LessonCompletion.objects.filter(
+                student=request.user,
+                lesson__course=course
+            ).count()
+            progress = int((completed_count / total_lessons) * 100) if total_lessons > 0 else 100
+            progress = min(100, progress)
+            enrollment.progress_percent = progress
+            enrollment.save()
+
+        return Response({"message": "Dars muvaffaqiyatli yakunlandi", "progress": progress})
+

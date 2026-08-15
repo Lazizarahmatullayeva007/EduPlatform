@@ -14,7 +14,11 @@
     {% if course.cover_image %}
     <img src="{{ course.cover_image.url }}"
          alt="{{ course.title }}"
-         class="w-full h-96 object-cover">
+         class="w-full h-96 object-cover"
+         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+    <div class="h-96 bg-gradient-to-r from-blue-600 to-indigo-600 items-center justify-center text-8xl text-white hidden">
+        📚
+    </div>
     {% else %}
     <div class="h-96 bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-8xl text-white">
         📚

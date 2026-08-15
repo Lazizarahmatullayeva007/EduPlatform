@@ -147,22 +147,76 @@ def toggle_publish(request, slug):
     return redirect('courses:teacher_dashboard')
 
 
-class CourseListAPIView(APIView):
-    def get(self, request):
-        courses = Course.objects.filter(is_published=True)
-        serializer = CourseSerializer(courses, many=True)
-        return Response(serializer.data)
+from django.db.models import Q
+from rest_framework.exceptions import PermissionDenied
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from .models import Course, Category, Comment
+from .forms import CourseForm, CommentForm
+from users.decorators import teacher_required
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .serializers import CourseSerializer, CategorySerializer, CommentSerializer
+from rest_framework import viewsets
+from rest_framework import filters
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import CourseFilter
+from .permissions import IsCourseTeacherOrReadOnly
 
 
+@extend_schema_view(
+    list=extend_schema(tags=['Kurslar'], summary='Barcha nashr qilingan kurslar ro\'yxati'),
+    retrieve=extend_schema(tags=['Kurslar'], summary='Kurs tafsilotlari'),
+    create=extend_schema(tags=['Kurslar'], summary='Yangi kurs yaratish (faqat o\'qituvchilar)'),
+    update=extend_schema(tags=['Kurslar'], summary='Kursni to\'liq yangilash'),
+    partial_update=extend_schema(tags=['Kurslar'], summary='Kursni qisman yangilash'),
+    destroy=extend_schema(tags=['Kurslar'], summary='Kursni o\'chirish'),
+)
 class CourseViewSet(viewsets.ModelViewSet):
-    queryset = Course.objects.filter(is_published=True)
     serializer_class = CourseSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsCourseTeacherOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = CourseFilter
     search_fields = ['title', 'description']
     ordering_fields = ['price', 'created_at']
     ordering = ['-created_at']
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated:
+            if getattr(user, 'role', '') == 'teacher' or user.is_staff:
+                return Course.objects.filter(Q(is_published=True) | Q(teacher=user)).select_related('teacher', 'category')
+        return Course.objects.filter(is_published=True).select_related('teacher', 'category')
+
     def perform_create(self, serializer):
-        serializer.save(teacher=self.request.user)
+        user = self.request.user
+        if getattr(user, 'role', '') != 'teacher' and not user.is_staff:
+            raise PermissionDenied("Faqat o'qituvchilar kurs yarata oladi.")
+        serializer.save(teacher=user)
+
+
+@extend_schema_view(
+    list=extend_schema(tags=['Kategoriyalar'], summary='Barcha kategoriyalar ro\'yxati'),
+    retrieve=extend_schema(tags=['Kategoriyalar'], summary='Kategoriya tafsilotlari'),
+)
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = None
+
+
+@extend_schema_view(
+    list=extend_schema(tags=['Izohlar'], summary='Kurs izohlari ro\'yxati'),
+    create=extend_schema(tags=['Izohlar'], summary='Kursga izoh qoldirish'),
+)
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.select_related('author', 'course').all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['course']
+    ordering = ['-created_at']
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)

@@ -2,6 +2,10 @@
 __pycache__/
 *.pyc
 .env
-media/
 node_modules/
 staticfiles/
+media/lessons/videos/
+*.mp4
+*.mkv
+*.avi
+*.mov

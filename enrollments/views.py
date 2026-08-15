@@ -113,13 +113,26 @@ def simulate_payment_success(request, transaction_id):
     return redirect('courses:course_detail', slug=payment.course.slug)
 
 
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
+from .serializers import EnrollmentSerializer, PaymentSerializer, InitiatePaymentResponseSerializer
+
+
 class InitiatePaymentView(APIView):
     """
     DRF orqali JWT bilan ishlaydigan versiya (tashqi API mijozlar uchun,
     masalan mobil ilova). HTML sayt esa yuqoridagi checkout()ni ishlatadi.
     """
     permission_classes = [IsAuthenticated]
+    serializer_class = InitiatePaymentResponseSerializer
 
+    @extend_schema(
+        tags=['To\'lovlar va Yozilishlar'],
+        summary='Kurs uchun to\'lov jarayonini boshlash (API)',
+        responses={
+            200: InitiatePaymentResponseSerializer,
+            400: OpenApiResponse(description="Allaqachon yozilgan yoki xato kurs"),
+        }
+    )
     def post(self, request, slug):
         course = get_object_or_404(Course, slug=slug, is_published=True)
 
@@ -150,12 +163,17 @@ def payment_webhook(request):
     if request.method != 'POST':
         return JsonResponse({"error": "Faqat POST so'rov qabul qilinadi"}, status=405)
 
-    data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
+    except (json.JSONDecodeError, ValueError):
+        return JsonResponse({"error": "Noto'g'ri JSON format"}, status=400)
+
     transaction_id = data.get('transaction_id')
     received_signature = request.headers.get('X-Signature', '')
+    secret_key = getattr(settings, 'PAYME_WEBHOOK_SECRET', 'eduplatform_payme_secret_key')
 
     expected_signature = hmac.new(
-        settings.PAYME_WEBHOOK_SECRET.encode(),
+        secret_key.encode(),
         str(transaction_id).encode(),
         hashlib.sha256,
     ).hexdigest()
@@ -177,13 +195,35 @@ def payment_webhook(request):
     return JsonResponse({"message": "To'lov tasdiqlandi, talaba kursga yozildi"})
 
 
+@extend_schema_view(
+    list=extend_schema(tags=['To\'lovlar va Yozilishlar'], summary='Foydalanuvchining yozilgan kurslari ro\'yxati'),
+    retrieve=extend_schema(tags=['To\'lovlar va Yozilishlar'], summary='Yozilish tafsilotlari'),
+    create=extend_schema(tags=['To\'lovlar va Yozilishlar'], summary='Kursga yozilish (API)'),
+    destroy=extend_schema(tags=['To\'lovlar va Yozilishlar'], summary='Kursdan chiqish (yozilishni bekor qilish)'),
+)
 class MyEnrollmentsViewSet(viewsets.ModelViewSet):
     """Foydalanuvchi o'z kurslarini ko'radi va yangi kursga API orqali yoziladi."""
     serializer_class = EnrollmentSerializer
     permission_classes = [IsAuthenticated, CourseNotFull]
+    http_method_names = ['get', 'post', 'delete', 'head', 'options']
 
     def get_queryset(self):
-        return Enrollment.objects.filter(student=self.request.user)
+        return Enrollment.objects.filter(student=self.request.user).select_related('course')
 
     def perform_create(self, serializer):
         serializer.save(student=self.request.user)
+
+
+@extend_schema_view(
+    list=extend_schema(tags=['To\'lovlar va Yozilishlar'], summary='Foydalanuvchining to\'lovlari tarixi'),
+    retrieve=extend_schema(tags=['To\'lovlar va Yozilishlar'], summary='To\'lov tafsilotlari'),
+)
+class PaymentHistoryViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if getattr(user, 'role', '') == 'teacher':
+            return Payment.objects.filter(course__teacher=user).select_related('student', 'course')
+        return Payment.objects.filter(student=user).select_related('student', 'course')

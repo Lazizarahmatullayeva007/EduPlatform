@@ -6,6 +6,7 @@ app_name = 'enrollments'
 
 router = DefaultRouter()
 router.register('api/my-courses', views.MyEnrollmentsViewSet, basename='my-enrollments')
+router.register('api/payments', views.PaymentHistoryViewSet, basename='payment-history')
 
 urlpatterns = [
     path('enroll/<slug:slug>/', views.enroll_course, name='enroll_course'),

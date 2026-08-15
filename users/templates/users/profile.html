@@ -14,7 +14,12 @@
             {% if user.avatar %}
                 <img src="{{ user.avatar.url }}" alt="{{ user.username }}"
                      style="width: 110px; height: 110px; min-width: 110px; min-height: 110px;"
-                     class="w-28 h-28 rounded-full object-cover border-4 border-blue-500/30 dark:border-blue-400/30 shadow-md shrink-0">
+                     class="w-28 h-28 rounded-full object-cover border-4 border-blue-500/30 dark:border-blue-400/30 shadow-md shrink-0"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div style="width: 110px; height: 110px; display: none;"
+                     class="w-28 h-28 rounded-full bg-blue-600 items-center justify-center text-white text-4xl font-bold border-4 border-blue-400/30 shadow-md shrink-0">
+                    {{ user.username|first|upper }}
+                </div>
             {% else %}
                 <div style="width: 110px; height: 110px;"
                      class="w-28 h-28 rounded-full bg-blue-600 flex items-center justify-center text-white text-4xl font-bold border-4 border-blue-400/30 shadow-md shrink-0">

@@ -6,6 +6,8 @@ app_name = 'courses'
 
 router = DefaultRouter()
 router.register('api/courses', views.CourseViewSet, basename='course-api')
+router.register('api/categories', views.CategoryViewSet, basename='category-api')
+router.register('api/comments', views.CommentViewSet, basename='comment-api')
 
 urlpatterns = [
     path('', views.course_list, name='course_list'),

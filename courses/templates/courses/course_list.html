@@ -23,7 +23,13 @@
             <!-- Rasm -->
             <div class="h-48 w-full overflow-hidden relative">
                 {% if course.cover_image %}
-                    <img src="{{ course.cover_image.url }}" alt="{{ course.title }}" class="w-full h-full object-cover">
+                    <img src="{{ course.cover_image.url }}"
+                         alt="{{ course.title }}"
+                         class="w-full h-full object-cover"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="w-full h-full bg-gradient-to-r from-blue-600 to-indigo-600 items-center justify-center text-slate-100 dark:text-slate-200 text-4xl hidden">
+                        📚
+                    </div>
                 {% else %}
                     <div class="w-full h-full bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-slate-100 dark:text-slate-200 text-4xl">
                         📚
