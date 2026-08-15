@@ -1,120 +1,149 @@
 {% extends 'base.html' %}
 
-{% block title %}Mening kurslarim{% endblock %}
+{% block title %}Mening kurslarim — O'qituvchi boshqaruvi{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
 
-    <!-- Yuqori qism: Sarlavha va Yaratish tugmasi -->
-    <div class="flex items-center justify-between">
+    <!-- Yuqori qism: Sarlavha va Yaratish tugmasi (Mobil va Desktop uchun moslashuvchan) -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100 transition-colors">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 transition-colors">
                 Mening kurslarim
             </h1>
-            <p class="text-slate-500 dark:text-slate-400 mt-1">
-                Yaratgan kurslaringizni shu yerdan boshqaring.
+            <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm">
+                Yaratgan kurslaringizni shu yerdan boshqaring va yangi darslar qo'shing.
             </p>
         </div>
 
         <a href="{% url 'courses:course_create' %}"
-           class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-xl transition shadow-sm inline-flex items-center gap-2">
+           class="w-full sm:w-auto text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-3 rounded-xl transition shadow-md inline-flex items-center justify-center gap-2 text-sm">
             <span>+</span> Yangi kurs yaratish
         </a>
     </div>
 
-    <!-- Karta va Jadval konteyneri -->
-    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-md overflow-hidden transition-colors duration-300 border border-slate-100 dark:border-slate-700">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+    <!-- MOBIL EKRANLAR UCHUN KARTALAR (md:hidden) -->
+    <div class="space-y-4 md:hidden">
+        {% for course in courses %}
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+            <div class="flex items-start justify-between gap-3">
+                <a href="{% url 'courses:course_detail' course.slug %}" class="font-bold text-lg text-blue-600 dark:text-blue-400 hover:underline">
+                    {{ course.title }}
+                </a>
+                {% if course.is_published %}
+                    <span class="shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">
+                        ✅ Nashr
+                    </span>
+                {% else %}
+                    <span class="shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300">
+                        📝 Qoralama
+                    </span>
+                {% endif %}
+            </div>
 
-                <!-- Jadval sarlavhasi (Header) -->
-                <thead>
-                    <tr class="border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 text-sm font-semibold">
-                        <th class="py-4 px-6">Nomi</th>
-                        <th class="py-4 px-6">Holati</th>
-                        <th class="py-4 px-6">Talabalar</th>
-                        <th class="py-4 px-6">Narxi</th>
-                        <th class="py-4 px-6 text-right">Amal</th>
-                    </tr>
-                </thead>
+            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 dark:bg-slate-700/40 p-3 rounded-xl">
+                <div>
+                    <span class="text-slate-500 dark:text-slate-400 block">Talabalar:</span>
+                    <span class="font-bold text-slate-800 dark:text-slate-200 text-sm">{{ course.student_count }} ta</span>
+                </div>
+                <div>
+                    <span class="text-slate-500 dark:text-slate-400 block">Narxi:</span>
+                    <span class="font-bold text-blue-600 dark:text-blue-400 text-sm">{{ course.price }} so'm</span>
+                </div>
+            </div>
 
-                <!-- Jadval tanasi (Body) -->
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60 text-sm">
-                    {% for course in courses %}
-                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition">
+            <!-- Mobil tugmalar -->
+            <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
+                <a href="{% url 'courses:course_edit' course.slug %}"
+                   class="flex-1 text-center py-2 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 font-semibold text-xs transition">
+                    Tahrirlash
+                </a>
 
-                        <!-- Nomi -->
-                        <td class="py-4 px-6 font-medium text-blue-600 dark:text-blue-400">
-                            <a href="{% url 'courses:course_detail' course.slug %}" class="hover:underline">
-                                {{ course.title }}
-                            </a>
-                        </td>
+                <form action="{% url 'courses:toggle_publish' course.slug %}" method="post" class="flex-1">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition">
+                        {% if course.is_published %}Qoralama{% else %}Nashr{% endif %}
+                    </button>
+                </form>
 
-                        <!-- Holati -->
-                        <td class="py-4 px-6">
-                            {% if course.is_published %}
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">
-                                    ✅ Nashr qilingan
-                                </span>
-                            {% else %}
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300">
-                                    📝 Qoralama
-                                </span>
-                            {% endif %}
-                        </td>
-
-                        <!-- Talabalar soni -->
-                        <td class="py-4 px-6 text-slate-600 dark:text-slate-300">
-                            {{ course.student_count }} ta
-                        </td>
-
-                        <!-- Narxi -->
-                        <td class="py-4 px-6 font-bold text-slate-800 dark:text-slate-100">
-                            {{ course.price }} so'm
-                        </td>
-
-                        <!-- Harakatlar (Amal) -->
-                        <td class="py-4 px-6 text-right space-x-2 whitespace-nowrap">
-
-                            <!-- Tahrirlash -->
-                            <a href="{% url 'courses:course_edit' course.slug %}"
-                               class="inline-block px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/80 font-medium transition text-xs">
-                                Tahrirlash
-                            </a>
-
-                            <!-- Qoralama / Nashr qilish -->
-                            <form action="{% url 'courses:toggle_publish' course.slug %}" method="post" class="inline">
-                                {% csrf_token %}
-                                <button type="submit"
-                                        class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 font-medium transition text-xs cursor-pointer">
-                                    {% if course.is_published %}
-                                        Qoralama
-                                    {% else %}
-                                        Nashr qilish
-                                    {% endif %}
-                                </button>
-                            </form>
-
-                            <!-- O'chirish -->
-                            <a href="{% url 'courses:course_delete' course.slug %}"
-                               class="inline-block px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-900/40 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/80 font-medium transition text-xs">
-                                O'chirish
-                            </a>
-
-                        </td>
-
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="py-8 text-center text-slate-400 dark:text-slate-500">
-                            Hozircha hech qanday kurs yaratilmagan.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-
-            </table>
+                <a href="{% url 'courses:course_delete' course.slug %}"
+                   class="px-3 py-2 rounded-xl bg-red-50 dark:bg-red-900/40 text-red-600 dark:text-red-400 font-semibold text-xs transition">
+                    O'chirish
+                </a>
+            </div>
         </div>
+        {% empty %}
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-8 text-center text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700">
+            Hozircha hech qanday kurs yaratilmagan.
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- DESKTOP JADVALI (hidden md:block) -->
+    <div class="hidden md:block bg-white dark:bg-slate-800 rounded-2xl shadow-md overflow-hidden transition-colors duration-300 border border-slate-200 dark:border-slate-700">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 text-sm font-semibold">
+                    <th class="py-4 px-6">Nomi</th>
+                    <th class="py-4 px-6">Holati</th>
+                    <th class="py-4 px-6">Talabalar</th>
+                    <th class="py-4 px-6">Narxi</th>
+                    <th class="py-4 px-6 text-right">Amal</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60 text-sm">
+                {% for course in courses %}
+                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition">
+                    <td class="py-4 px-6 font-semibold text-blue-600 dark:text-blue-400">
+                        <a href="{% url 'courses:course_detail' course.slug %}" class="hover:underline">
+                            {{ course.title }}
+                        </a>
+                    </td>
+                    <td class="py-4 px-6">
+                        {% if course.is_published %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300">
+                                ✅ Nashr qilingan
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300">
+                                📝 Qoralama
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="py-4 px-6 text-slate-600 dark:text-slate-300 font-medium">
+                        {{ course.student_count }} ta
+                    </td>
+                    <td class="py-4 px-6 font-bold text-slate-800 dark:text-slate-100">
+                        {{ course.price }} so'm
+                    </td>
+                    <td class="py-4 px-6 text-right space-x-2 whitespace-nowrap">
+                        <a href="{% url 'courses:course_edit' course.slug %}"
+                           class="inline-block px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 hover:bg-blue-100 font-medium transition text-xs">
+                            Tahrirlash
+                        </a>
+                        <form action="{% url 'courses:toggle_publish' course.slug %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 font-medium transition text-xs cursor-pointer">
+                                {% if course.is_published %}Qoralama{% else %}Nashr qilish{% endif %}
+                            </button>
+                        </form>
+                        <a href="{% url 'courses:course_delete' course.slug %}"
+                           class="inline-block px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-900/40 text-red-600 dark:text-red-400 hover:bg-red-100 font-medium transition text-xs">
+                            O'chirish
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="py-8 text-center text-slate-400 dark:text-slate-500">
+                        Hozircha hech qanday kurs yaratilmagan.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
 </div>

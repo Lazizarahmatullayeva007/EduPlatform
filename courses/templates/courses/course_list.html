@@ -3,25 +3,25 @@
 {% block title %}Barcha kurslar — EduPlatform{% endblock %}
 
 {% block content %}
-<div class="space-y-8">
+<div class="space-y-6 sm:space-y-8">
 
     <!-- Sahifa sarlavhasi -->
     <div>
-        <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white transition-colors">
+        <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white transition-colors tracking-tight">
             Barcha kurslar
         </h1>
-        <p class="text-slate-600 dark:text-slate-300 mt-2 text-base">
-            O'zingizga mos kursni tanlang va o'rganishni boshlang.
+        <p class="text-slate-600 dark:text-slate-300 mt-1.5 text-sm sm:text-base">
+            O'zingizga mos kursni tanlang va professional ustozlar bilan o'rganishni boshlang.
         </p>
     </div>
 
-    <!-- Kurslar kartalari -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Kurslar kartalari (Mobil: 1 ustun, Planshet: 2 ustun, Desktop: 3 ustun) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
         {% for course in courses %}
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700/60 flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm hover:shadow-xl border border-slate-200/80 dark:border-slate-700/60 flex flex-col transition-all duration-300 hover:-translate-y-1 overflow-hidden">
 
             <!-- Rasm -->
-            <div class="h-48 w-full overflow-hidden relative">
+            <div class="h-48 sm:h-52 w-full overflow-hidden relative bg-slate-900">
                 {% if course.cover_image %}
                     <img src="{{ course.cover_image.url }}"
                          alt="{{ course.title }}"
@@ -38,25 +38,31 @@
             </div>
 
             <!-- Ma'lumotlar -->
-            <div class="p-6 flex flex-col flex-1 justify-between">
+            <div class="p-5 sm:p-6 flex flex-col flex-1 justify-between gap-4">
                 <div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                    {% if course.category %}
+                    <span class="inline-block bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 px-2.5 py-0.5 rounded-full text-xs font-bold mb-2">
+                        {{ course.category.name }}
+                    </span>
+                    {% endif %}
+
+                    <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-snug">
                         {{ course.title }}
                     </h3>
 
-                    <div class="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-sm mb-4">
+                    <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-2">
                         <span>👨‍🏫</span>
-                        <span>{{ course.teacher.username|default:"Eduplatform" }}</span>
+                        <span class="font-medium">{{ course.teacher.username|default:"Eduplatform" }}</span>
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700/60 mt-2">
-                    <span class="text-lg font-bold text-blue-600 dark:text-blue-400">
+                <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700/60">
+                    <span class="text-base sm:text-lg font-extrabold text-blue-600 dark:text-blue-400">
                         {{ course.price }} so'm
                     </span>
 
                     <a href="{% url 'courses:course_detail' course.slug %}"
-                       class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-xl transition text-sm shadow-sm">
+                       class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-xl transition text-xs sm:text-sm shadow-sm">
                         Batafsil
                     </a>
                 </div>
@@ -64,7 +70,7 @@
 
         </div>
         {% empty %}
-        <div class="col-span-full text-center py-12 text-slate-500 dark:text-slate-400">
+        <div class="col-span-full text-center py-16 text-slate-500 dark:text-slate-400">
             Hozircha hech qanday kurs mavjud emas.
         </div>
         {% endfor %}
