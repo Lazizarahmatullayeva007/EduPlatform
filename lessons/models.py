@@ -55,13 +55,14 @@ class Lesson(models.Model):
     def embed_video_url(self):
         if not self.video_url:
             return ''
-        url = self.video_url
-        if 'youtu.be/' in url:
-            video_id = url.split('youtu.be/')[-1].split('?')[0]
-            return f'https://www.youtube.com/embed/{video_id}'
-        if 'watch?v=' in url:
-            video_id = url.split('watch?v=')[-1].split('&')[0]
-            return f'https://www.youtube.com/embed/{video_id}'
+        url = self.video_url.strip()
+        import re
+        # Regex to catch YouTube ID from regular URLs, youtu.be, shorts, embed, etc.
+        pattern = r'(?:https?:\/\/)?(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?.*v=|embed\/|v\/|shorts\/)|youtu\.be\/)([\w-]{11})'
+        match = re.search(pattern, url)
+        if match:
+            video_id = match.group(1)
+            return f'https://www.youtube.com/embed/{video_id}?rel=0&enablejsapi=1'
         return url
 
 
