@@ -208,6 +208,16 @@ def course_students(request, slug):
     avg_progress = round(total_progress_sum / total_students_count, 1) if total_students_count > 0 else 0
     completed_students_count = sum(1 for item in leaderboard if item['is_completed'])
 
+    return render(request, 'courses/course_students.html', {
+        'course': course,
+        'leaderboard': leaderboard,
+        'total_students_count': total_students_count,
+        'avg_progress': avg_progress,
+        'completed_students_count': completed_students_count,
+        'total_lessons': total_lessons,
+    })
+
+
 from enrollments.models import Enrollment
 
 
