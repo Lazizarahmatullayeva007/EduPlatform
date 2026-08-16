@@ -208,15 +208,27 @@ def course_students(request, slug):
     avg_progress = round(total_progress_sum / total_students_count, 1) if total_students_count > 0 else 0
     completed_students_count = sum(1 for item in leaderboard if item['is_completed'])
 
-    return render(request, 'courses/course_students.html', {
-        'course': course,
-        'leaderboard': leaderboard,
-        'total_students_count': total_students_count,
-        'avg_progress': avg_progress,
-        'completed_students_count': completed_students_count,
-        'total_lessons': total_lessons,
-    })
+from enrollments.models import Enrollment
 
+
+@login_required
+@teacher_required
+def remove_student(request, slug, student_id):
+    """
+    O'qituvchi o'z kursidan istalgan talabani chiqarib yuborishi uchun view.
+    """
+    if request.method == 'POST':
+        course = get_object_or_404(Course, slug=slug, teacher=request.user)
+        enrollment = get_object_or_404(Enrollment, course=course, student_id=student_id)
+        student_name = enrollment.student.username
+
+        # Kursdagi yozilishini va bajargan darslarini o'chirish
+        enrollment.delete()
+        LessonCompletion.objects.filter(student_id=student_id, lesson__course=course).delete()
+
+        messages.success(request, f"'{student_name}' talabasi '{course.title}' kursidan chiqarib yuborildi.")
+
+    return redirect('courses:course_students', slug=slug)
 
 
 @login_required
