@@ -142,6 +142,85 @@ def teacher_dashboard(request):
 
 @login_required
 @teacher_required
+def course_students(request, slug):
+    """
+    O'qituvchi uchun kurs talabalari reytingi, foizi va nechanchi darsga kelganligi hisoboti.
+    """
+    course = get_object_or_404(
+        Course.objects.prefetch_related('enrollments__student', 'lessons'),
+        slug=slug,
+        teacher=request.user
+    )
+
+    enrollments = course.enrollments.select_related('student').all()
+    all_lessons = list(course.lessons.all().order_by('order', 'id'))
+    total_lessons = len(all_lessons)
+
+    completions = LessonCompletion.objects.filter(lesson__course=course).values('student_id', 'lesson_id')
+    student_completions = {}
+    for comp in completions:
+        student_completions.setdefault(comp['student_id'], set()).add(comp['lesson_id'])
+
+    leaderboard = []
+    total_progress_sum = 0
+
+    for enrollment in enrollments:
+        student_completed_ids = student_completions.get(enrollment.student_id, set())
+        completed_count = len(student_completed_ids)
+
+        current_lesson_str = "1-dars (Hali boshlamagan)"
+        current_lesson_num = 1
+        if total_lessons > 0:
+            if completed_count >= total_lessons:
+                current_lesson_str = "Barcha darslarni tugatgan 🏆"
+                current_lesson_num = total_lessons
+            else:
+                for idx, les in enumerate(all_lessons):
+                    if les.id not in student_completed_ids:
+                        current_lesson_num = idx + 1
+                        current_lesson_str = f"{idx + 1}-dars: {les.title}"
+                        break
+        else:
+            current_lesson_str = "Darslar yuklanmagan"
+            current_lesson_num = 0
+
+        progress = enrollment.progress_percent
+        total_progress_sum += progress
+
+        leaderboard.append({
+            'student': enrollment.student,
+            'enrolled_at': enrollment.enrolled_at,
+            'progress_percent': progress,
+            'completed_count': completed_count,
+            'total_lessons': total_lessons,
+            'current_lesson': current_lesson_str,
+            'current_lesson_num': current_lesson_num,
+            'is_completed': completed_count >= total_lessons and total_lessons > 0,
+        })
+
+    # Saralash: Progress foizi yuqori, dars soni ko'p va ertaroq boshlaganlar yuqorida
+    leaderboard.sort(key=lambda x: (-x['progress_percent'], -x['completed_count'], x['enrolled_at']))
+
+    for rank, item in enumerate(leaderboard, 1):
+        item['rank'] = rank
+
+    total_students_count = len(leaderboard)
+    avg_progress = round(total_progress_sum / total_students_count, 1) if total_students_count > 0 else 0
+    completed_students_count = sum(1 for item in leaderboard if item['is_completed'])
+
+    return render(request, 'courses/course_students.html', {
+        'course': course,
+        'leaderboard': leaderboard,
+        'total_students_count': total_students_count,
+        'avg_progress': avg_progress,
+        'completed_students_count': completed_students_count,
+        'total_lessons': total_lessons,
+    })
+
+
+
+@login_required
+@teacher_required
 def course_delete(request, slug):
     """
     Faqat kursning O'ZI YARATGAN o'qituvchisi o'chira oladi -

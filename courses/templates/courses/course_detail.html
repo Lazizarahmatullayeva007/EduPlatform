@@ -108,10 +108,16 @@
         </h2>
 
         {% if user.is_authenticated and course.teacher == user %}
-        <a href="{% url 'lessons:lesson_create' course.slug %}"
-           class="w-full sm:w-auto text-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-sm">
-            + Yangi dars qo'shish
-        </a>
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{% url 'courses:course_students' course.slug %}"
+               class="w-full sm:w-auto text-center bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 border border-indigo-200 dark:border-indigo-800 px-4 py-2.5 rounded-xl font-bold text-sm transition shadow-sm inline-flex items-center justify-center gap-1.5">
+                <span>🏆</span> Talabalar reytingi ({{ course.enrollments.count }})
+            </a>
+            <a href="{% url 'lessons:lesson_create' course.slug %}"
+               class="w-full sm:w-auto text-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition shadow-sm">
+                + Yangi dars qo'shish
+            </a>
+        </div>
         {% endif %}
     </div>
 

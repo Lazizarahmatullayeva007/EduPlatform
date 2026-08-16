@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block title %}Talabalar reytingi — {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Orqaga qaytish havolalari -->
+    <div class="flex items-center gap-4 text-sm font-semibold">
+        <a href="{% url 'courses:teacher_dashboard' %}" class="text-blue-600 dark:text-blue-400 hover:underline">
+            ← O'qituvchi boshqaruvi
+        </a>
+        <span class="text-slate-400">/</span>
+        <a href="{% url 'courses:course_detail' course.slug %}" class="text-slate-600 dark:text-slate-300 hover:underline">
+            {{ course.title }}
+        </a>
+    </div>
+
+    <!-- Sarlavha va Umumiy Statistika -->
+    <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700/60 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <span class="inline-block bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full text-xs font-bold mb-2">
+                    👥 O'qituvchi tahlili
+                </span>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100">
+                    Talabalar reytingi va progressi
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm">
+                    "<strong class="text-slate-700 dark:text-slate-300">{{ course.title }}</strong>" kursi bo'yicha talabalarning o'zlashtirish ko'rsatkichlari
+                </p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a href="{% url 'lessons:lesson_create' course.slug %}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2.5 rounded-xl transition text-xs sm:text-sm shadow-sm inline-flex items-center gap-1.5">
+                    <span>+</span> Dars qo'shish
+                </a>
+            </div>
+        </div>
+
+        <!-- 3 ta statistika kartasi -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-slate-100 dark:border-slate-700/60">
+            <div class="bg-slate-50 dark:bg-slate-700/40 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700">
+                <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Jami talabalar</p>
+                <p class="text-2xl sm:text-3xl font-extrabold text-blue-600 dark:text-blue-400 mt-1">
+                    {{ total_students_count }} ta
+                </p>
+            </div>
+
+            <div class="bg-slate-50 dark:bg-slate-700/40 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700">
+                <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">O'rtacha o'zlashtirish</p>
+                <p class="text-2xl sm:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-1">
+                    {{ avg_progress }}%
+                </p>
+            </div>
+
+            <div class="bg-slate-50 dark:bg-slate-700/40 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700">
+                <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Kursni tugatganlar</p>
+                <p class="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">
+                    {{ completed_students_count }} ta
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Talabalar ro'yxati va qidiruv -->
+    <div class="space-y-4">
+        
+        <div class="flex items-center justify-between gap-4">
+            <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <span>🏆</span> Reyting jadvali ({{ total_students_count }})
+            </h2>
+
+            <input type="text" id="studentSearch" placeholder="Talabani qidirish..."
+                   onkeyup="filterStudents()"
+                   class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 w-48 sm:w-64">
+        </div>
+
+        {% if leaderboard %}
+
+        <!-- MOBIL KARTALAR (md:hidden) -->
+        <div class="space-y-3 md:hidden" id="mobileLeaderboard">
+            {% for item in leaderboard %}
+            <div class="student-card bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm space-y-3"
+                 data-name="{{ item.student.username|lower }} {{ item.student.email|lower }}">
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="font-extrabold text-base w-7 text-center">
+                            {% if item.rank == 1 %}🥇
+                            {% elif item.rank == 2 %}🥈
+                            {% elif item.rank == 3 %}🥉
+                            {% else %}<span class="text-slate-400 text-xs">#{{ item.rank }}</span>
+                            {% endif %}
+                        </span>
+
+                        <div>
+                            <p class="font-bold text-sm text-slate-900 dark:text-slate-100">
+                                {{ item.student.username }}
+                            </p>
+                            <p class="text-xs text-slate-400 truncate max-w-[180px]">
+                                {{ item.student.email }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <span class="font-extrabold text-sm {% if item.progress_percent == 100 %}text-emerald-600 dark:text-emerald-400{% else %}text-blue-600 dark:text-blue-400{% endif %}">
+                        {{ item.progress_percent }}%
+                    </span>
+                </div>
+
+                <!-- Progress bar -->
+                <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                    <div class="{% if item.progress_percent == 100 %}bg-emerald-500{% else %}bg-blue-600{% endif %} h-2 rounded-full transition-all"
+                         style="width: {{ item.progress_percent }}%"></div>
+                </div>
+
+                <!-- Nechanchi darsga kelganligi & Yakunlangan darslar -->
+                <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 dark:bg-slate-700/40 p-3 rounded-xl">
+                    <div>
+                        <span class="text-slate-400 block">Tugallagan darslari:</span>
+                        <span class="font-bold text-slate-800 dark:text-slate-200">{{ item.completed_count }} / {{ item.total_lessons }} ta</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block">Hozirgi holati:</span>
+                        <span class="font-bold {% if item.is_completed %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-800 dark:text-slate-200{% endif %} truncate block">
+                            {{ item.current_lesson }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between text-xs text-slate-400 pt-1">
+                    <span>Yozilgan: {{ item.enrolled_at|date:"d.m.Y" }}</span>
+                    {% if item.is_completed %}
+                        <span class="text-emerald-600 dark:text-emerald-400 font-bold">✅ Kursni bitirgan</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- DESKTOP JADVALI (hidden md:block) -->
+        <div class="hidden md:block bg-white dark:bg-slate-800 rounded-3xl shadow-sm overflow-hidden border border-slate-200 dark:border-slate-700/60">
+            <table class="w-full text-left border-collapse" id="desktopTable">
+                <thead>
+                    <tr class="border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 text-xs font-bold uppercase tracking-wider">
+                        <th class="py-4 px-6 text-center w-16">O'rin</th>
+                        <th class="py-4 px-6">Talaba</th>
+                        <th class="py-4 px-6">Progress</th>
+                        <th class="py-4 px-6 text-center">Tugallangan darslar</th>
+                        <th class="py-4 px-6">Kelgan darsi</th>
+                        <th class="py-4 px-6 text-right">Sana</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60 text-sm">
+                    {% for item in leaderboard %}
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition student-row"
+                        data-name="{{ item.student.username|lower }} {{ item.student.email|lower }}">
+                        
+                        <!-- Reyting o'rni -->
+                        <td class="py-4 px-6 text-center font-extrabold text-base">
+                            {% if item.rank == 1 %}
+                                <span class="text-2xl" title="1-o'rin">🥇</span>
+                            {% elif item.rank == 2 %}
+                                <span class="text-2xl" title="2-o'rin">🥈</span>
+                            {% elif item.rank == 3 %}
+                                <span class="text-2xl" title="3-o'rin">🥉</span>
+                            {% else %}
+                                <span class="text-slate-400 text-sm font-semibold">#{{ item.rank }}</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Talaba ma'lumotlari -->
+                        <td class="py-4 px-6">
+                            <div class="flex items-center gap-3">
+                                {% if item.student.avatar %}
+                                    <img src="{{ item.student.avatar.url }}" alt="{{ item.student.username }}"
+                                         class="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-slate-700">
+                                {% else %}
+                                    <div class="w-9 h-9 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs">
+                                        {{ item.student.username|first|upper }}
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <p class="font-bold text-slate-900 dark:text-slate-100">
+                                        {{ item.student.username }}
+                                    </p>
+                                    <p class="text-xs text-slate-400">
+                                        {{ item.student.email }}
+                                    </p>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Progress Bar va Foizi -->
+                        <td class="py-4 px-6">
+                            <div class="w-40">
+                                <div class="flex items-center justify-between text-xs mb-1 font-bold">
+                                    <span class="{% if item.progress_percent == 100 %}text-emerald-600 dark:text-emerald-400{% else %}text-blue-600 dark:text-blue-400{% endif %}">
+                                        {{ item.progress_percent }}%
+                                    </span>
+                                </div>
+                                <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                                    <div class="{% if item.progress_percent == 100 %}bg-emerald-500{% else %}bg-blue-600{% endif %} h-2 rounded-full"
+                                         style="width: {{ item.progress_percent }}%"></div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Tugallangan darslar soni -->
+                        <td class="py-4 px-6 text-center font-bold text-slate-700 dark:text-slate-300">
+                            {{ item.completed_count }} <span class="text-slate-400 font-normal">/ {{ item.total_lessons }}</span>
+                        </td>
+
+                        <!-- Qaysi darsga kelganligi -->
+                        <td class="py-4 px-6 font-semibold {% if item.is_completed %}text-emerald-600 dark:text-emerald-400{% else %}text-slate-800 dark:text-slate-200{% endif %}">
+                            {{ item.current_lesson }}
+                        </td>
+
+                        <!-- Yozilgan sana -->
+                        <td class="py-4 px-6 text-right text-xs text-slate-400">
+                            {{ item.enrolled_at|date:"d.m.Y" }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% else %}
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-12 text-center text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700">
+            <span class="text-4xl block mb-2">👥</span>
+            <p class="font-semibold">Ushbu kursga hali hech qaysi talaba yozilmagan.</p>
+        </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+<script>
+function filterStudents() {
+    const input = document.getElementById('studentSearch').value.toLowerCase();
+    
+    // Desktop rows
+    const rows = document.querySelectorAll('.student-row');
+    rows.forEach(row => {
+        const name = row.getAttribute('data-name');
+        row.style.display = name.includes(input) ? '' : 'none';
+    });
+
+    // Mobile cards
+    const cards = document.querySelectorAll('.student-card');
+    cards.forEach(card => {
+        const name = card.getAttribute('data-name');
+        card.style.display = name.includes(input) ? '' : 'none';
+    });
+}
+</script>
+
+{% endblock %}
