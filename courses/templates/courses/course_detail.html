@@ -115,32 +115,93 @@
         {% endif %}
     </div>
 
-    {% if course.lessons.all %}
+    {% if all_lessons %}
     <div class="space-y-3">
-        {% for lesson in course.lessons.all %}
-        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-4 hover:shadow-md transition">
-            <a href="{% url 'lessons:lesson_detail' course.slug lesson.id %}" class="flex-1 min-w-0">
-                <h3 class="font-bold text-base sm:text-lg text-slate-900 dark:text-slate-100 truncate">
-                    {{ forloop.counter }}. {{ lesson.title }}
-                </h3>
-                <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-0.5">
-                    {{ lesson.get_lesson_type_display }}
-                </p>
-            </a>
+        {% for l in all_lessons %}
+            {% if is_teacher or is_enrolled %}
+                {% if l.id in unlocked_lesson_ids %}
+                    <!-- Ochiq dars (Talaba yozilgan va ochilgan yoki O'qituvchi) -->
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-4 hover:shadow-md transition">
+                        <a href="{% url 'lessons:lesson_detail' course.slug l.id %}" class="flex-1 min-w-0">
+                            <h3 class="font-bold text-base sm:text-lg text-slate-900 dark:text-slate-100 truncate hover:text-blue-600 dark:hover:text-blue-400">
+                                {{ forloop.counter }}. {{ l.title }}
+                            </h3>
+                            <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-0.5">
+                                {{ l.get_lesson_type_display }}
+                            </p>
+                        </a>
 
-            <div class="flex items-center gap-2 shrink-0">
-                <span class="bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-lg text-xs font-semibold">
-                    {{ lesson.duration_minutes }} min
-                </span>
+                        <div class="flex items-center gap-2 shrink-0">
+                            {% if l.id in completed_lesson_ids %}
+                                <span class="bg-green-100 dark:bg-green-900/60 text-green-700 dark:text-green-300 px-3 py-1 rounded-lg text-xs font-bold">
+                                    ✅ Tugallangan
+                                </span>
+                            {% else %}
+                                <a href="{% url 'lessons:lesson_detail' course.slug l.id %}"
+                                   class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1 rounded-lg text-xs font-semibold shadow-sm transition">
+                                    ▶ Darsni boshlash
+                                </a>
+                            {% endif %}
 
-                {% if user.is_authenticated and course.teacher == user %}
-                <a href="{% url 'lessons:lesson_delete' course.slug lesson.id %}"
-                   class="bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-600 dark:text-red-400 px-3 py-1 rounded-lg text-xs font-semibold transition">
-                    O'chirish
-                </a>
+                            <span class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-lg text-xs font-semibold">
+                                {{ l.duration_minutes }} min
+                            </span>
+
+                            {% if is_teacher and course.teacher == user %}
+                            <a href="{% url 'lessons:lesson_delete' course.slug l.id %}"
+                               class="bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-600 dark:text-red-400 px-3 py-1 rounded-lg text-xs font-semibold transition">
+                                O'chirish
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Qulflangan dars (Oldingi dars hali tugatilmagan) -->
+                    <div class="bg-slate-50/80 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-4 opacity-75">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-base sm:text-lg text-slate-500 dark:text-slate-400 truncate flex items-center gap-2">
+                                <span>🔒</span>
+                                <span>{{ forloop.counter }}. {{ l.title }}</span>
+                            </h3>
+                            <p class="text-slate-400 dark:text-slate-500 text-xs mt-0.5">
+                                Oldingi darsni yakunlaganingizdan so'ng avtomatik ochiladi
+                            </p>
+                        </div>
+
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 px-3 py-1 rounded-lg text-xs font-bold">
+                                🔒 Qulflangan
+                            </span>
+                        </div>
+                    </div>
                 {% endif %}
-            </div>
-        </div>
+            {% else %}
+                <!-- Kursga yozilmagan / To'lov qilinmagan foydalanuvchi uchun darslar qulfi -->
+                <div class="bg-slate-50/80 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-4 opacity-75">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-base sm:text-lg text-slate-500 dark:text-slate-400 truncate flex items-center gap-2">
+                            <span>🔒</span>
+                            <span>{{ forloop.counter }}. {{ l.title }}</span>
+                        </h3>
+                        <p class="text-slate-400 dark:text-slate-500 text-xs mt-0.5">
+                            {% if course.price > 0 %}
+                                Darslarni ko'rish uchun avval kursga to'lov qiling
+                            {% else %}
+                                Darslarni ko'rish uchun kursga yoziling
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 px-3 py-1 rounded-lg text-xs font-bold">
+                            🔒 Qulflangan
+                        </span>
+                        <span class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-lg text-xs font-semibold">
+                            {{ l.duration_minutes }} min
+                        </span>
+                    </div>
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
     {% else %}

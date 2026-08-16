@@ -27,6 +27,9 @@ def course_list(request):
 
 
 
+from lessons.models import LessonCompletion
+
+
 def course_detail(request, slug):
     course = get_object_or_404(
         Course.objects.select_related('teacher', 'category').prefetch_related('lessons', 'comments__author'),
@@ -35,8 +38,34 @@ def course_detail(request, slug):
     )
 
     is_enrolled = False
+    is_teacher = False
+    completed_lesson_ids = set()
+    unlocked_lesson_ids = set()
+
+    all_lessons = list(course.lessons.all().order_by('order', 'id'))
+
     if request.user.is_authenticated:
+        is_teacher = (course.teacher == request.user) or request.user.is_staff
         is_enrolled = course.enrollments.filter(student=request.user).exists()
+
+        if is_teacher:
+            unlocked_lesson_ids = set(l.id for l in all_lessons)
+        elif is_enrolled:
+            completed_lesson_ids = set(
+                LessonCompletion.objects.filter(
+                    student=request.user,
+                    lesson__course=course
+                ).values_list('lesson_id', flat=True)
+            )
+            # Ketma-ket dars ochilish logikasi:
+            # 1-dars doim ochiq. Keyingi dars esa oldingi dars yakunlangandagina ochiladi.
+            for idx, l in enumerate(all_lessons):
+                if idx == 0:
+                    unlocked_lesson_ids.add(l.id)
+                else:
+                    prev_l = all_lessons[idx - 1]
+                    if prev_l.id in completed_lesson_ids or l.id in completed_lesson_ids:
+                        unlocked_lesson_ids.add(l.id)
 
     if request.method == 'POST' and request.user.is_authenticated:
         comment_form = CommentForm(request.POST)
@@ -55,9 +84,14 @@ def course_detail(request, slug):
     return render(request, 'courses/course_detail.html', {
         'course': course,
         'is_enrolled': is_enrolled,
+        'is_teacher': is_teacher,
+        'all_lessons': all_lessons,
+        'unlocked_lesson_ids': unlocked_lesson_ids,
+        'completed_lesson_ids': completed_lesson_ids,
         'comment_form': comment_form,
         'comments': comments,
     })
+
 
 @login_required
 @teacher_required

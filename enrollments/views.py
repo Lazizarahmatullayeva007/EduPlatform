@@ -23,15 +23,23 @@ import hashlib
 def enroll_course(request, slug):
     course = get_object_or_404(Course, slug=slug, is_published=True)
 
+    if course.price > 0:
+        messages.warning(request, "Bu kurs pullik. Yozilish uchun to'lovni amalga oshiring.")
+        return redirect('enrollments:checkout', slug=slug)
+
     already_enrolled = Enrollment.objects.filter(student=request.user, course=course).exists()
 
     if already_enrolled:
-        messages.error(request, "Siz allaqachon bu kursga yozilgansiz")
+        messages.info(request, "Siz allaqachon bu kursga yozilgansiz")
     else:
+        if course.is_full():
+            messages.error(request, "Ushbu kursda bo'sh o'rin qolmagan.")
+            return redirect('courses:course_detail', slug=slug)
         Enrollment.objects.create(student=request.user, course=course)
-        messages.success(request, "Muvaffaqiyatli kursga yozildingiz!")
+        messages.success(request, "Muvaffaqiyatli kursga yozildingiz! 1-dars ochildi.")
 
     return redirect('courses:course_detail', slug=slug)
+
 
 
 @login_required
