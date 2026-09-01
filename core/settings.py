@@ -224,3 +224,25 @@ DJOSER = {
         'user_create': 'users.serializers.UserCreateSerializer',
     },
 }
+
+
+# ==========================================
+# CELERY & REDIS CONFIGURATION
+# ==========================================
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+
+# ==========================================
+# REDIS CACHING
+# ==========================================
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': config('REDIS_CACHE_URL', default='redis://localhost:6379/1'),
+    }
+}
+

@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count
@@ -33,9 +34,13 @@ from lessons.models import LessonCompletion
 def course_detail(request, slug):
     course = get_object_or_404(
         Course.objects.select_related('teacher', 'category').prefetch_related('lessons', 'comments__author'),
-        slug=slug,
-        is_published=True
+        slug=slug
     )
+
+    if not course.is_published:
+        is_owner_or_staff = request.user.is_authenticated and (course.teacher == request.user or request.user.is_staff)
+        if not is_owner_or_staff:
+            raise Http404("Ushbu kurs topilmadi yoki hali nashr etilmagan.")
 
     is_enrolled = False
     is_teacher = False

@@ -1,15 +1,14 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Enrollment
-from .telegram_utils import send_telegram_message
+from .tasks import send_telegram_notification_task, send_enrollment_email_task
 
 
 @receiver(post_save, sender=Enrollment)
 def notify_teacher_on_enrollment(sender, instance, created, **kwargs):
     """
     Yangi Enrollment yaratilganda (kursga yozilganda), o'qituvchiga
-    Telegram orqali xabar yuboradi. Faqat YANGI yaratilganda ishlaydi
-    (mavjud Enrollment yangilanganda emas).
+    Telegram orqali xabar va talabaga emailni asinxron (Celery orqali) yuboradi.
     """
     if not created:
         return
@@ -19,7 +18,6 @@ def notify_teacher_on_enrollment(sender, instance, created, **kwargs):
         f"Kurs: {instance.course.title}\n"
         f"Talaba: {instance.student.username}"
     )
-    send_telegram_message(text)
-
-    from .email_utils import send_enrollment_email
-    send_enrollment_email(instance.student, instance.course)
+    # Celery orqali fonda bajarish
+    send_telegram_notification_task.delay(text)
+    send_enrollment_email_task.delay(instance.student_id, instance.course_id)
