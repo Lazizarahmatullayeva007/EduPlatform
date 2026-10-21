@@ -121,7 +121,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # }
 
 import sys
-import urllib.parse
+import dj_database_url
 
 DATABASE_URL = config('DATABASE_URL', default=None)
 
@@ -133,16 +133,13 @@ if 'test' in sys.argv:
         }
     }
 elif DATABASE_URL:
-    url = urllib.parse.urlparse(DATABASE_URL)
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': url.path[1:],
-            'USER': url.username,
-            'PASSWORD': url.password,
-            'HOST': url.hostname,
-            'PORT': url.port or 5432,
-        }
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require='render.com' in DATABASE_URL,
+        )
     }
 elif config('DB_NAME', default=None):
     DATABASES = {
