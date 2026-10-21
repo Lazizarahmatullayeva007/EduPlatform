@@ -89,7 +89,14 @@ class SendVerificationCodeView(APIView):
         code = str(random.randint(100000, 999999))
         SMSVerification.objects.create(phone_number=phone_number, code=code)
 
-        send_sms_task.delay(phone_number, f"EduPlatform tasdiqlash kodi: {code}")
+        try:
+            send_sms_task.delay(phone_number, f"EduPlatform tasdiqlash kodi: {code}")
+        except Exception:
+            try:
+                from .eskiz_utils import send_sms
+                send_sms(phone_number, f"EduPlatform tasdiqlash kodi: {code}")
+            except Exception:
+                pass
 
         return Response({"message": "Kod yuborildi", "phone_number": phone_number})
 

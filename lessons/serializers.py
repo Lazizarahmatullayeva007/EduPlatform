@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 from .models import Lesson, LessonCompletion
 
 
@@ -16,6 +17,7 @@ class LessonSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'created_at', 'duration_minutes']
 
+    @extend_schema_field(serializers.CharField(allow_null=True))
     def get_video_file_url(self, obj):
         if obj.video_file:
             request = self.context.get('request')

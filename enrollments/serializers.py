@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 from .models import Enrollment, Payment
 from courses.models import Course
 
@@ -13,6 +14,7 @@ class EnrollmentSerializer(serializers.ModelSerializer):
         fields = ['id', 'course', 'course_title', 'course_slug', 'course_cover', 'enrolled_at', 'progress_percent']
         read_only_fields = ['id', 'enrolled_at']
 
+    @extend_schema_field(serializers.CharField(allow_null=True))
     def get_course_cover(self, obj):
         if obj.course.cover_image:
             request = self.context.get('request')

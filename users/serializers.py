@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -62,6 +63,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'username', 'role', 'is_phone_verified', 'avatar_url']
 
+    @extend_schema_field(serializers.CharField(allow_null=True))
     def get_avatar_url(self, obj):
         if obj.avatar:
             request = self.context.get('request')

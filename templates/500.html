@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Server xatosi (500) — EduPlatform{% endblock %}
+
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full text-center space-y-6">
+        <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 text-5xl shadow-sm">
+            ⚠️
+        </div>
+
+        <div class="space-y-2">
+            <h1 class="text-6xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">500</h1>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200">Serverda kutilmagan xatolik</h2>
+            <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                Tizimda vaqtinchalik xatolik yuz berdi. Iltimos, bir ozdan keyin sahifani yangilang yoki administratorga murojaat qiling.
+            </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <a href="/"
+               class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition shadow-sm">
+                Bosh sahifaga qaytish
+            </a>
+            <button onclick="window.location.reload()"
+               class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold text-sm transition cursor-pointer">
+                Sahifani yangilash
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 from .models import Course, Category, Comment
 
 
@@ -40,6 +41,7 @@ class CourseSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'slug', 'teacher', 'created_at', 'updated_at']
 
+    @extend_schema_field(serializers.CharField(allow_null=True))
     def get_cover_image_url(self, obj):
         if obj.cover_image:
             request = self.context.get('request')
@@ -48,8 +50,10 @@ class CourseSerializer(serializers.ModelSerializer):
             return obj.cover_image.url
         return None
 
+    @extend_schema_field(serializers.IntegerField)
     def get_available_seats(self, obj):
         return obj.available_seats()
 
+    @extend_schema_field(serializers.BooleanField)
     def get_is_full(self, obj):
         return obj.is_full()
